@@ -92,6 +92,13 @@ const SoundVisualizer = () => {
 
   return (
     <div className="space-y-4">
+      <HowToUse steps={[
+        "Click 'Start Mic' to begin capturing audio from your microphone.",
+        "Choose a visualization style (Bars, Wave, Circles, etc.) and color theme.",
+        "Use the Record button to capture video of the visualization.",
+        "For rounded/plain styles, you can upload a center image.",
+        "Export audio-only recordings using the Audio Record button.",
+      ]} title="How to use?" />
       {/* Status */}
       <div className="flex items-center gap-2">
         {state.isRecording && <span className="text-red-500 font-bold animate-pulse text-sm">● REC</span>}
