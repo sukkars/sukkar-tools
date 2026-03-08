@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { tools, categories } from "@/lib/tools";
-import { Menu, X, Wrench, Search, Home } from "lucide-react";
+import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import TextCaseConverter from "@/components/tools/TextCaseConverter";
 import WordCounter from "@/components/tools/WordCounter";
 import PasswordGenerator from "@/components/tools/PasswordGenerator";
@@ -69,12 +69,75 @@ const toolComponents: Record<string, React.FC> = {
   steadfast: SteadfastBooking,
 };
 
+/* ─── How To Use (inline collapsible) ─── */
+const HowToUseSection = ({ steps }: { steps: string[] }) => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="mt-6 rounded-lg border border-border overflow-hidden">
+      <button
+        onClick={() => setOpen(!open)}
+        className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors"
+      >
+        <span className="flex items-center gap-2">
+          <HelpCircle className="w-4 h-4 text-primary" />
+          কিভাবে ব্যবহার করবেন?
+        </span>
+        {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+      </button>
+      {open && (
+        <div className="px-4 pb-3 pt-1 border-t border-border bg-muted/20">
+          <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground">
+            {steps.map((step, i) => <li key={i}>{step}</li>)}
+          </ol>
+        </div>
+      )}
+    </div>
+  );
+};
+
+/* ─── Footer ─── */
+const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
+  const [showGuide, setShowGuide] = useState(false);
+  const activeTool = toolTitle ? tools.find(t => t.title === toolTitle) : null;
+
+  return (
+    <footer className="mt-8 pt-4 border-t border-border text-center space-y-2">
+      <div className="flex items-center justify-center gap-2 flex-wrap text-sm">
+        <a href="/" className="hover:text-primary transition-colors">🛠️ Tools</a>
+        <span className="text-muted-foreground">|</span>
+        <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary transition-colors">🏠 Homepage</a>
+        {activeTool && (
+          <>
+            <span className="text-muted-foreground">|</span>
+            <button onClick={() => setShowGuide(!showGuide)} className="hover:text-primary transition-colors">⁉️ How to use?</button>
+          </>
+        )}
+      </div>
+      {showGuide && activeTool && (
+        <div className="text-left max-w-lg mx-auto bg-muted/20 border border-border rounded-lg p-3 mt-2">
+          <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground">
+            {activeTool.howToUse.map((step, i) => <li key={i}>{step}</li>)}
+          </ol>
+        </div>
+      )}
+      <p className="text-xs text-muted-foreground">
+        <strong>{toolTitle || "Sukkar Toolbox"}</strong> v1.0 | Powered by{" "}
+        <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary">sukkarshop.com</a>
+      </p>
+      <p className="text-[11px] text-muted-foreground/70">
+        সব টুল আপনার ব্রাউজারে চলে — কোনো ডেটা সার্ভারে পাঠানো হয় না। ব্যবহার সম্পূর্ণ আপনার দায়িত্বে।
+      </p>
+    </footer>
+  );
+};
+
 const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
 
   const ActiveComponent = activeTool ? toolComponents[activeTool] : null;
+  const activeToolDef = activeTool ? tools.find(t => t.id === activeTool) : null;
 
   const filteredTools = tools.filter(
     (t) =>
@@ -98,7 +161,7 @@ const Index = () => {
             <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: "var(--gradient-primary)" }}>
               <Wrench className="w-4 h-4 text-sidebar-primary-foreground" />
             </div>
-            <span className="text-base font-bold text-sidebar-accent-foreground tracking-tight">Toolbox</span>
+            <span className="text-base font-bold text-sidebar-accent-foreground tracking-tight">Sukkar Toolbox</span>
           </button>
           <button className="ml-auto lg:hidden text-sidebar-foreground" onClick={() => setSidebarOpen(false)}>
             <X className="w-5 h-5" />
@@ -142,19 +205,24 @@ const Index = () => {
       </aside>
 
       {/* Main content */}
-      <main className="flex-1 min-w-0">
+      <main className="flex-1 min-w-0 flex flex-col">
+        {/* Header */}
         <header className="sticky top-0 z-30 flex items-center gap-3 px-4 sm:px-6 py-3 border-b border-border bg-background/80 backdrop-blur-sm">
           <button className="lg:hidden text-foreground" onClick={() => setSidebarOpen(true)}>
             <Menu className="w-5 h-5" />
           </button>
+          <button onClick={goHome} className="flex items-center gap-2 lg:hidden">
+            <Wrench className="w-4 h-4 text-primary" />
+            <span className="font-bold text-sm">Sukkar Toolbox</span>
+          </button>
           {activeTool ? (
-            <div className="text-sm text-muted-foreground">
+            <div className="text-sm text-muted-foreground hidden sm:block">
               <button onClick={goHome} className="hover:text-foreground">All Tools</button>
               <span className="mx-1.5">/</span>
-              <span className="text-foreground font-medium">{tools.find((t) => t.id === activeTool)?.title}</span>
+              <span className="text-foreground font-medium">{activeToolDef?.title}</span>
             </div>
           ) : (
-            <div className="flex-1 max-w-md">
+            <div className="flex-1 max-w-md ml-auto sm:ml-0">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                 <input
@@ -168,17 +236,21 @@ const Index = () => {
           )}
         </header>
 
-        <div className="p-4 sm:p-6 lg:p-8">
+        <div className="flex-1 p-4 sm:p-6 lg:p-8">
           {ActiveComponent ? (
             <div className="max-w-4xl">
               <ActiveComponent />
+              {/* How To Use below every tool */}
+              {activeToolDef && <HowToUseSection steps={activeToolDef.howToUse} />}
+              {/* Footer */}
+              <ToolFooter toolTitle={activeToolDef?.title} />
             </div>
           ) : (
             /* Home grid */
             <div className="space-y-8">
               <div className="text-center max-w-2xl mx-auto">
                 <h1 className="text-3xl sm:text-4xl font-bold tracking-tight">
-                  <span style={{ backgroundImage: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Toolbox</span>
+                  <span style={{ backgroundImage: "var(--gradient-primary)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Sukkar Toolbox</span>
                 </h1>
                 <p className="text-muted-foreground mt-2">
                   {tools.length} free tools — all running in your browser, no data leaves your device.
@@ -221,6 +293,9 @@ const Index = () => {
                   No tools found for "{search}"
                 </div>
               )}
+
+              {/* Home footer */}
+              <ToolFooter />
             </div>
           )}
         </div>

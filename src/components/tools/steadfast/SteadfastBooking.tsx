@@ -4,7 +4,7 @@ import ApiKeySetup from "./ApiKeySetup";
 import SingleBooking from "./SingleBooking";
 import BulkBooking from "./BulkBooking";
 import AiBulkBooking from "./AiBulkBooking";
-import HowToUse from "../HowToUse";
+
 
 type Tab = "single" | "bulk" | "ai";
 
@@ -22,15 +22,6 @@ const SteadfastBooking = () => {
       <h2 className="tool-title">Steadfast Booking</h2>
       <p className="tool-description">Steadfast কুরিয়ারে সহজে অর্ডার বুকিং করুন — Single, Bulk ও AI মোডে</p>
 
-      <HowToUse
-        steps={[
-          "প্রথমে আপনার Steadfast API Key ও Secret Key সেট করুন (নিচের সেটআপ অংশে)।",
-          "Single মোডে: কাস্টমারের মেসেজ পেস্ট করুন (নাম, ঠিকানা, ফোন, টাকা) → প্রসেস করুন → বুকিং কনফার্ম।",
-          "Bulk মোডে: একাধিক অর্ডার --- দিয়ে আলাদা করে পেস্ট করুন → এক্সট্র্যাক্ট → একসাথে বুকিং।",
-          "AI Bulk মোডে: মেসেঞ্জার থেকে কপি করা অগোছালো মেসেজ পেস্ট করুন → AI স্বয়ংক্রিয়ভাবে তথ্য বের করবে।",
-          "AI মোডের জন্য Google Gemini API Key প্রয়োজন (ফ্রি - AI Settings থেকে সেট করুন)।",
-        ]}
-      />
 
       {/* API Key Setup */}
       <ApiKeySetup />
