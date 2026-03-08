@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { tools, categories } from "@/lib/tools";
 import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp, Settings2, Key, AlertTriangle, Sun, Moon, Clock, Trash2, Mail } from "lucide-react";
 import TextCaseConverter from "@/components/tools/TextCaseConverter";
@@ -218,7 +219,9 @@ const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
 };
 
 const Index = () => {
-  const [activeTool, setActiveTool] = useState<string | null>(null);
+  const { toolId } = useParams();
+  const navigate = useNavigate();
+  const [activeTool, setActiveTool] = useState<string | null>(toolId || null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
@@ -230,6 +233,11 @@ const Index = () => {
     }
     return false;
   });
+
+  // Sync activeTool with URL params
+  useEffect(() => {
+    setActiveTool(toolId || null);
+  }, [toolId]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
@@ -276,10 +284,13 @@ const Index = () => {
       t.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const goHome = () => { setActiveTool(null); setSearch(""); };
+  const goHome = () => { 
+    navigate("/");
+    setSearch(""); 
+  };
 
   const selectTool = (id: string) => {
-    setActiveTool(id);
+    navigate(`/tool/${id}`);
     setSidebarOpen(false);
     trackRecent(id);
   };
