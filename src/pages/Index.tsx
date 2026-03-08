@@ -196,6 +196,37 @@ const Index = () => {
     localStorage.setItem("theme", dark ? "dark" : "light");
   }, [dark]);
 
+  // Recent tools (last 30 days)
+  const LS_RECENT = "recentTools";
+  const ONE_MONTH = 30 * 24 * 60 * 60 * 1000;
+
+  const getRecent = (): { id: string; ts: number }[] => {
+    try {
+      const raw = JSON.parse(localStorage.getItem(LS_RECENT) || "[]");
+      const now = Date.now();
+      return raw.filter((r: { ts: number }) => now - r.ts < ONE_MONTH);
+    } catch { return []; }
+  };
+
+  const [recentEntries, setRecentEntries] = useState(getRecent);
+
+  const trackRecent = (toolId: string) => {
+    const now = Date.now();
+    const filtered = getRecent().filter(r => r.id !== toolId);
+    const updated = [{ id: toolId, ts: now }, ...filtered].slice(0, 20);
+    localStorage.setItem(LS_RECENT, JSON.stringify(updated));
+    setRecentEntries(updated);
+  };
+
+  const clearRecent = () => {
+    localStorage.removeItem(LS_RECENT);
+    setRecentEntries([]);
+  };
+
+  const recentTools = recentEntries
+    .map(r => tools.find(t => t.id === r.id))
+    .filter(Boolean) as typeof tools;
+
   const ActiveComponent = activeTool ? toolComponents[activeTool] : null;
   const activeToolDef = activeTool ? tools.find(t => t.id === activeTool) : null;
 
@@ -206,6 +237,12 @@ const Index = () => {
   );
 
   const goHome = () => { setActiveTool(null); setSearch(""); };
+
+  const selectTool = (id: string) => {
+    setActiveTool(id);
+    setSidebarOpen(false);
+    trackRecent(id);
+  };
 
   return (
     <div className="flex min-h-screen">
