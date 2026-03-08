@@ -26,7 +26,7 @@ export const tools: ToolDef[] = [
   { id: "base64", title: "Base64", description: "Encode & decode", icon: Binary, category: "dev" },
   { id: "uuid", title: "UUID Generator", description: "Random UUIDs", icon: Fingerprint, category: "dev" },
   { id: "html-bbcode", title: "HTML → BBCode", description: "Convert HTML to BBCode", icon: Code, category: "dev" },
-  { id: "csv", title: "CSV Generator", description: "Build & download CSV", icon: Table, category: "dev" },
+  { id: "woo-csv", title: "WooCommerce CSV", description: "WooCommerce product import CSV", icon: Table, category: "generators" },
   { id: "hash", title: "Hash Generator", description: "SHA-1, SHA-256, SHA-512", icon: ShieldCheck, category: "dev" },
   { id: "regex", title: "Regex Helper", description: "Test & build regex", icon: Regex, category: "dev" },
 
