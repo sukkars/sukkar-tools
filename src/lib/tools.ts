@@ -126,6 +126,9 @@ export const tools: ToolDef[] = [
     requiresApi: { name: "Steadfast API", key: "steadfast_api_key", description: "Steadfast courier API key" },
     howToUse: ["প্রথমে Steadfast API Key ও Secret Key সেট করুন।", "Single মোডে: কাস্টমারের মেসেজ পেস্ট করুন → প্রসেস → বুকিং কনফার্ম।", "Bulk মোডে: একাধিক অর্ডার --- দিয়ে আলাদা করে দিন → একসাথে বুকিং।", "AI Bulk মোডে: মেসেঞ্জারের অগোছালো মেসেজ পেস্ট করুন → AI তথ্য বের করবে।", "AI মোডের জন্য Google Gemini API Key প্রয়োজন (ফ্রি)।"],
     howToUseEn: ["First, set up your Steadfast API Key & Secret Key in the tool's API setup section.", "Single mode: Paste a customer message → Process → Confirm booking.", "Bulk mode: Separate multiple orders with --- and submit them all at once.", "AI Bulk mode: Paste messy Messenger messages → AI extracts customer info automatically.", "⚠️ Requires: Steadfast API Key (set inside this tool). AI Bulk also needs a Google Gemini API Key (set via ⚙️ Settings in the header)."] },
+  { id: "url-shortener", title: "URL Shortener", description: "Shorten URLs with is.gd & v.gd", icon: Link2, category: "generators",
+    howToUse: ["URL পেস্ট করুন (http:// বা https:// সহ)।", "is.gd বা v.gd সার্ভিস সিলেক্ট করুন, অথবা 'সবগুলো দিয়ে শর্ট করুন' চেক করুন।", "শর্ট করুন বাটনে ক্লিক করুন।", "রেজাল্ট থেকে কপি বাটনে ক্লিক করে শর্ট URL কপি করুন।"],
+    howToUseEn: ["Paste a URL (including http:// or https://).", "Select is.gd or v.gd, or check 'Shorten with all' to use both.", "Click the Shorten button.", "Copy the shortened URL from the results."] },
 ];
 
 export const categories = [
