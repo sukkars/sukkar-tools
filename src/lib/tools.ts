@@ -1,4 +1,4 @@
-import { Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint, Code, MessageCircle, StickyNote, Table } from "lucide-react";
+import { Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint, Code, MessageCircle, StickyNote, Table, AudioWaveform } from "lucide-react";
 
 export interface ToolDef {
   id: string;
