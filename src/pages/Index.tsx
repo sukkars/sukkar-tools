@@ -119,7 +119,7 @@ const ApiSettingsPanel = ({ onClose }: { onClose: () => void }) => {
           <div>
             <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Google Gemini API Key <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">AI Features</span></label>
             <input value={geminiKey} onChange={e => setGeminiKey(e.target.value)} placeholder="AIza..." className="tool-input w-full text-sm" type="password" />
-            <p className="text-[11px] text-muted-foreground mt-0.5">ফ্রি পেতে: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" className="text-primary hover:underline">aistudio.google.com</a></p>
+            <p className="text-[11px] text-muted-foreground mt-0.5">Get a free key: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" className="text-primary hover:underline">aistudio.google.com</a></p>
           </div>
           <div>
             <label className="text-sm font-medium flex items-center gap-1.5 mb-1">AI Model</label>
