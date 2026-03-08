@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { tools, categories } from "@/lib/tools";
-import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp, Settings2, Key, AlertTriangle } from "lucide-react";
 import TextCaseConverter from "@/components/tools/TextCaseConverter";
 import WordCounter from "@/components/tools/WordCounter";
 import PasswordGenerator from "@/components/tools/PasswordGenerator";
