@@ -32,6 +32,7 @@ import InvoiceGenerator from "@/components/tools/InvoiceGenerator";
 import RegexHelper from "@/components/tools/RegexHelper";
 import M3uPlayer from "@/components/tools/M3uPlayer";
 import DataEncoder from "@/components/tools/DataEncoder";
+import SteadfastBooking from "@/components/tools/steadfast/SteadfastBooking";
 
 const toolComponents: Record<string, React.FC> = {
   "text-case": TextCaseConverter,
