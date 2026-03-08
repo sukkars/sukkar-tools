@@ -36,6 +36,7 @@ const toolComponents: Record<string, React.FC> = {
   whatsapp: WhatsAppLinkGenerator,
   notes: FreshNotes,
   csv: CsvGenerator,
+  "sound-viz": SoundVisualizer,
 };
 
 const Index = () => {
