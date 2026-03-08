@@ -208,13 +208,6 @@ const M3uPlayer = () => {
     <div className="space-y-4">
       <h2 className="tool-title">M3U Player</h2>
       <p className="tool-description">Play streams or load M3U playlists with quality selection</p>
-      <HowToUse steps={[
-        "Paste a direct stream URL and click play, or paste an M3U playlist URL to load channels.",
-        "Upload a local .m3u/.m3u8 file using the 'Load M3U File' button.",
-        "Use the playlist panel to browse and search channels.",
-        "For video streams: hover over the video for controls — PiP, fullscreen, speed.",
-        "Channels with multiple sources show a 'Quality' button to switch between them.",
-      ]} title="How to use?" />
       {/* Mode tabs */}
       <div className="flex gap-2">
         <button onClick={() => setMode("single")} className={mode === "single" ? "tool-btn text-xs" : "tool-btn-outline text-xs"}>

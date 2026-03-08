@@ -144,12 +144,6 @@ const DataEncoder = () => {
     <div className="animate-fade-in space-y-4">
       <h1 className="tool-title">Data Encoder / Decoder</h1>
       <p className="tool-description">Encode or decode text & file data in multiple formats — all processed in your browser.</p>
-      <HowToUse steps={[
-        "Select an encoding format (Base16, Base32, Base64, Base85, Binary, URL, or Decimal).",
-        "Type or paste text in the input field, or upload a file using the file input.",
-        "Click Encode to convert to the selected format, or Decode to convert back.",
-        "Copy the result using the copy button.",
-      ]} title="How to use?" />
       {/* Format selection */}
       <div className="flex flex-wrap gap-1.5">
         {FORMATS.map((f) => (
