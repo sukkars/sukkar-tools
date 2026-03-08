@@ -132,11 +132,11 @@ export const tools: ToolDef[] = [
 ];
 
 export const categories = [
-  { id: "text", label: "Text Tools" },
-  { id: "dev", label: "Developer" },
-  { id: "converters", label: "Converters" },
-  { id: "generators", label: "Generators" },
-  { id: "calculators", label: "Calculators" },
-  { id: "media", label: "Media" },
   { id: "productivity", label: "Productivity" },
+  { id: "media", label: "Media" },
+  { id: "calculators", label: "Calculators" },
+  { id: "generators", label: "Generators" },
+  { id: "converters", label: "Converters" },
+  { id: "dev", label: "Developer" },
+  { id: "text", label: "Text Tools" },
 ] as const;
