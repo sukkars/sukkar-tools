@@ -13,6 +13,10 @@ import AgeCalculator from "@/components/tools/AgeCalculator";
 import QrCodeGenerator from "@/components/tools/QrCodeGenerator";
 import MarkdownPreview from "@/components/tools/MarkdownPreview";
 import UuidGenerator from "@/components/tools/UuidGenerator";
+import HtmlBBCodeConverter from "@/components/tools/HtmlBBCodeConverter";
+import WhatsAppLinkGenerator from "@/components/tools/WhatsAppLinkGenerator";
+import FreshNotes from "@/components/tools/FreshNotes";
+import CsvGenerator from "@/components/tools/CsvGenerator";
 
 const toolComponents: Record<string, React.FC> = {
   "text-case": TextCaseConverter,
@@ -27,6 +31,10 @@ const toolComponents: Record<string, React.FC> = {
   qr: QrCodeGenerator,
   markdown: MarkdownPreview,
   uuid: UuidGenerator,
+  "html-bbcode": HtmlBBCodeConverter,
+  whatsapp: WhatsAppLinkGenerator,
+  notes: FreshNotes,
+  csv: CsvGenerator,
 };
 
 const Index = () => {
