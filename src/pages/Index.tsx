@@ -61,6 +61,8 @@ const toolComponents: Record<string, React.FC> = {
   barcode: BarcodeGenerator,
   "image-resize": ImageResizer,
   invoice: InvoiceGenerator,
+  regex: RegexHelper,
+  m3u: M3uPlayer,
 };
 
 const Index = () => {
