@@ -113,7 +113,7 @@ const ApiSettingsPanel = ({ onClose }: { onClose: () => void }) => {
           <Key className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-lg">API Settings</h3>
         </div>
-        <p className="text-xs text-muted-foreground">AI ফিচারের জন্য Google Gemini API key প্রয়োজন। আপনার key ব্রাউজারে সংরক্ষিত থাকবে, কোথাও পাঠানো হয় না।</p>
+        <p className="text-xs text-muted-foreground">Some tools use Google Gemini AI. Your key is stored locally in your browser and never sent to our servers.</p>
 
         <div className="space-y-3">
           <div>
