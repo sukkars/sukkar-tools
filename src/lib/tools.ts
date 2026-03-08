@@ -1,7 +1,7 @@
 import {
   Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint,
   Code, MessageCircle, StickyNote, Table, AudioWaveform, Calculator, Heart, Volume2, Mic, Keyboard,
-  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt
+  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio
 } from "lucide-react";
 
 export interface ToolDef {
@@ -28,6 +28,7 @@ export const tools: ToolDef[] = [
   { id: "html-bbcode", title: "HTML → BBCode", description: "Convert HTML to BBCode", icon: Code, category: "dev" },
   { id: "csv", title: "CSV Generator", description: "Build & download CSV", icon: Table, category: "dev" },
   { id: "hash", title: "Hash Generator", description: "SHA-1, SHA-256, SHA-512", icon: ShieldCheck, category: "dev" },
+  { id: "regex", title: "Regex Helper", description: "Test & build regex", icon: Regex, category: "dev" },
 
   // Converters
   { id: "color", title: "Color Picker", description: "HEX, RGB, HSL", icon: Palette, category: "converters" },
@@ -50,6 +51,7 @@ export const tools: ToolDef[] = [
   { id: "tts", title: "Text to Speech", description: "Read text aloud", icon: Volume2, category: "media" },
   { id: "stt", title: "Speech to Text", description: "Voice to text", icon: Mic, category: "media" },
   { id: "sound-viz", title: "Sound Visualizer", description: "Mic visualizer & recorder", icon: AudioWaveform, category: "media" },
+  { id: "m3u", title: "M3U Player", description: "Stream & playlist player", icon: Radio, category: "media" },
 
   // Productivity
   { id: "notes", title: "Fresh Notes", description: "Quick local notepad", icon: StickyNote, category: "productivity" },
