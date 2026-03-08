@@ -195,6 +195,19 @@ const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme");
+      if (saved) return saved === "dark";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  }, [dark]);
 
   const ActiveComponent = activeTool ? toolComponents[activeTool] : null;
   const activeToolDef = activeTool ? tools.find(t => t.id === activeTool) : null;
