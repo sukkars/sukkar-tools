@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { tools, categories } from "@/lib/tools";
-import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp, Settings2, Key, AlertTriangle } from "lucide-react";
+import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp, Settings2, Key, AlertTriangle, Sun, Moon } from "lucide-react";
 import TextCaseConverter from "@/components/tools/TextCaseConverter";
 import WordCounter from "@/components/tools/WordCounter";
 import PasswordGenerator from "@/components/tools/PasswordGenerator";
@@ -184,7 +184,7 @@ const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
         <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary">sukkarshop.com</a>
       </p>
       <p className="text-[11px] text-muted-foreground/70">
-        সব টুল আপনার ব্রাউজারে চলে — কোনো ডেটা সার্ভারে পাঠানো হয় না। ব্যবহার সম্পূর্ণ আপনার দায়িত্বে।
+        All tools run entirely in your browser — no data is sent to any server. Use at your own responsibility.
       </p>
     </footer>
   );
@@ -195,6 +195,19 @@ const Index = () => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme");
+      if (saved) return saved === "dark";
+      return window.matchMedia("(prefers-color-scheme: dark)").matches;
+    }
+    return false;
+  });
+
+  useEffect(() => {
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  }, [dark]);
 
   const ActiveComponent = activeTool ? toolComponents[activeTool] : null;
   const activeToolDef = activeTool ? tools.find(t => t.id === activeTool) : null;
@@ -294,7 +307,10 @@ const Index = () => {
               </div>
             </div>
           )}
-          <button onClick={() => setShowSettings(true)} className="ml-auto p-2 rounded-lg hover:bg-muted transition-colors" title="API Settings">
+          <button onClick={() => setDark(!dark)} className="ml-auto p-2 rounded-lg hover:bg-muted transition-colors" title={dark ? "Light mode" : "Dark mode"}>
+            {dark ? <Sun className="w-4 h-4 text-muted-foreground" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
+          </button>
+          <button onClick={() => setShowSettings(true)} className="p-2 rounded-lg hover:bg-muted transition-colors" title="API Settings">
             <Settings2 className="w-4 h-4 text-muted-foreground" />
           </button>
         </header>
