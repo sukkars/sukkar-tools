@@ -130,7 +130,7 @@ const ApiSettingsPanel = ({ onClose }: { onClose: () => void }) => {
           </div>
         </div>
 
-        <p className="text-[11px] text-muted-foreground">💡 Steadfast API key আলাদাভাবে Steadfast Booking টুলের মধ্যে সেট করুন।</p>
+        <p className="text-[11px] text-muted-foreground">💡 Steadfast API keys are configured separately inside the Steadfast Booking tool.</p>
 
         <div className="flex gap-2 pt-1">
           <button onClick={save} className="tool-btn flex-1">Save</button>
