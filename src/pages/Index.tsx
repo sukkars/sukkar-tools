@@ -307,7 +307,7 @@ const Index = () => {
               </div>
             </div>
           )}
-          <button onClick={() => setDark(!dark)} className="p-2 rounded-lg hover:bg-muted transition-colors" title={dark ? "Light mode" : "Dark mode"}>
+          <button onClick={() => setDark(!dark)} className="ml-auto p-2 rounded-lg hover:bg-muted transition-colors" title={dark ? "Light mode" : "Dark mode"}>
             {dark ? <Sun className="w-4 h-4 text-muted-foreground" /> : <Moon className="w-4 h-4 text-muted-foreground" />}
           </button>
           <button onClick={() => setShowSettings(true)} className="p-2 rounded-lg hover:bg-muted transition-colors" title="API Settings">
