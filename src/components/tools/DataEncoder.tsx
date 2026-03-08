@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { ArrowRightLeft, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
+import HowToUse from "./HowToUse";
 
 type Format = "base16" | "base32" | "base64" | "base85" | "binary" | "url" | "decimal";
 
