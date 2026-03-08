@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { tools, categories } from "@/lib/tools";
 import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp, Settings2, Key, AlertTriangle, Sun, Moon, Clock, Trash2, Mail } from "lucide-react";
 import TextCaseConverter from "@/components/tools/TextCaseConverter";
