@@ -284,10 +284,13 @@ const Index = () => {
       t.description.toLowerCase().includes(search.toLowerCase())
   );
 
-  const goHome = () => { setActiveTool(null); setSearch(""); };
+  const goHome = () => { 
+    navigate("/");
+    setSearch(""); 
+  };
 
   const selectTool = (id: string) => {
-    setActiveTool(id);
+    navigate(`/tool/${id}`);
     setSidebarOpen(false);
     trackRecent(id);
   };
