@@ -16,7 +16,7 @@ import UuidGenerator from "@/components/tools/UuidGenerator";
 import HtmlBBCodeConverter from "@/components/tools/HtmlBBCodeConverter";
 import WhatsAppLinkGenerator from "@/components/tools/WhatsAppLinkGenerator";
 import FreshNotes from "@/components/tools/FreshNotes";
-import CsvGenerator from "@/components/tools/CsvGenerator";
+import WooCsvGenerator from "@/components/tools/WooCsvGenerator";
 import SoundVisualizer from "@/components/tools/SoundVisualizer";
 import Calculator from "@/components/tools/Calculator";
 import BmiCalculator from "@/components/tools/BmiCalculator";
