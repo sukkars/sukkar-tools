@@ -41,7 +41,7 @@ export const tools: ToolDef[] = [
   { id: "qr", title: "QR Code", description: "Generate QR codes", icon: QrCode, category: "generators" },
   { id: "barcode", title: "Barcode", description: "Generate barcodes", icon: Barcode, category: "generators" },
   { id: "whatsapp", title: "WhatsApp Link", description: "Generate WA links", icon: MessageCircle, category: "generators" },
-  { id: "invoice", title: "Invoice", description: "Create & print invoices", icon: Receipt, category: "generators" },
+  { id: "invoice", title: "Invoice Maker", description: "Create & print invoices", icon: Receipt, category: "generators" },
 
   // Calculators
   { id: "calculator", title: "Calculator", description: "Basic & scientific", icon: Calculator, category: "calculators" },
