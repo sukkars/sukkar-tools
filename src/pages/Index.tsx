@@ -70,7 +70,7 @@ const toolComponents: Record<string, React.FC> = {
 };
 
 /* ─── How To Use (inline collapsible) ─── */
-const HowToUseSection = ({ steps }: { steps: string[] }) => {
+const HowToUseSection = ({ stepsBn, stepsEn }: { stepsBn: string[]; stepsEn: string[] }) => {
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-8 rounded-lg border border-border overflow-hidden">
@@ -80,14 +80,18 @@ const HowToUseSection = ({ steps }: { steps: string[] }) => {
       >
         <span className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-primary" />
-          কিভাবে ব্যবহার করবেন?
+          কিভাবে ব্যবহার করবেন? (⁉️ How to use?)
         </span>
         {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
       </button>
       {open && (
-        <div className="px-4 pb-3 pt-1 border-t border-border bg-muted/20">
+        <div className="px-4 pb-3 pt-2 border-t border-border bg-muted/20 space-y-3">
           <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground">
-            {steps.map((step, i) => <li key={i}>{step}</li>)}
+            {stepsBn.map((step, i) => <li key={i}>{step}</li>)}
+          </ol>
+          <hr className="border-border" />
+          <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground/70">
+            {stepsEn.map((step, i) => <li key={i}>{step}</li>)}
           </ol>
         </div>
       )}
