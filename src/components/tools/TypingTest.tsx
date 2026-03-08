@@ -73,6 +73,7 @@ const TypingTest = () => {
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState(60);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const [customText, setCustomText] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const filteredSamples = SAMPLES.filter((s) => langFilter === "all" || s.lang === langFilter);
@@ -147,6 +148,30 @@ const TypingTest = () => {
 
       {!targetText ? (
         <div className="space-y-3">
+          {/* Custom text input */}
+          <div className="tool-card !p-3 space-y-2">
+            <label className="text-sm font-medium">নিজের লেখা পেস্ট করুন (Custom Text)</label>
+            <textarea
+              placeholder="এখানে আপনার নিজের লেখা পেস্ট করুন..."
+              className="tool-textarea min-h-[60px] text-sm"
+              value={customText}
+              onChange={(e) => setCustomText(e.target.value)}
+            />
+            <button
+              disabled={!customText.trim() || customText.trim().length < 20}
+              onClick={() => { setTargetText(customText.trim()); setSelectedIndex(-1); setTimeout(() => inputRef.current?.focus(), 100); }}
+              className="tool-btn text-xs"
+            >
+              এই লেখা দিয়ে শুরু করুন
+            </button>
+          </div>
+
+          <div className="relative flex items-center gap-3 my-2">
+            <div className="flex-1 border-t border-border" />
+            <span className="text-xs text-muted-foreground">অথবা নিচ থেকে বেছে নিন</span>
+            <div className="flex-1 border-t border-border" />
+          </div>
+
           <div className="flex gap-2 items-center">
             <label className="text-sm text-muted-foreground">Language:</label>
             {([["all", "All"], ["en", "English"], ["bn", "বাংলা"]] as const).map(([val, label]) => (
@@ -156,7 +181,6 @@ const TypingTest = () => {
               </button>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground">Select a text to start typing:</p>
           <div className="space-y-1.5">
             {filteredSamples.map((s, i) => (
               <button key={i} onClick={() => selectText(i)}
