@@ -33,6 +33,7 @@ import RegexHelper from "@/components/tools/RegexHelper";
 import M3uPlayer from "@/components/tools/M3uPlayer";
 import DataEncoder from "@/components/tools/DataEncoder";
 import SteadfastBooking from "@/components/tools/steadfast/SteadfastBooking";
+import UrlShortener from "@/components/tools/UrlShortener";
 
 const toolComponents: Record<string, React.FC> = {
   "text-case": TextCaseConverter,
@@ -67,6 +68,7 @@ const toolComponents: Record<string, React.FC> = {
   regex: RegexHelper,
   m3u: M3uPlayer,
   steadfast: SteadfastBooking,
+  "url-shortener": UrlShortener,
 };
 
 /* ─── How To Use (inline collapsible) ─── */
