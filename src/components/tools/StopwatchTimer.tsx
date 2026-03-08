@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, RotateCcw, Flag, PictureInPicture2, X } from "lucide-react";
+import { Play, Pause, RotateCcw, Flag, PictureInPicture2, ExternalLink, X } from "lucide-react";
 
 const StopwatchTimer = () => {
   const [mode, setMode] = useState<"stopwatch" | "timer">("stopwatch");
@@ -8,17 +8,19 @@ const StopwatchTimer = () => {
   const [laps, setLaps] = useState<number[]>([]);
   const [timerInput, setTimerInput] = useState(300);
   const [pipOpen, setPipOpen] = useState(false);
+  const [popupOpen, setPopupOpen] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const startRef = useRef(0);
-  const pipWindowRef = useRef<Window | null>(null);
+  const popupWindowRef = useRef<Window | null>(null);
+  const pipCanvasRef = useRef<HTMLCanvasElement>(null);
+  const pipVideoRef = useRef<HTMLVideoElement>(null);
   const msRef = useRef(ms);
 
-  // Keep msRef in sync
   useEffect(() => { msRef.current = ms; }, [ms]);
 
   useEffect(() => () => {
     clearInterval(intervalRef.current);
-    pipWindowRef.current?.close();
+    popupWindowRef.current?.close();
   }, []);
 
   const start = () => {
@@ -56,25 +58,82 @@ const StopwatchTimer = () => {
     return `${h > 0 ? h.toString().padStart(2, "0") + ":" : ""}${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}.${centis.toString().padStart(2, "0")}`;
   };
 
-  // PiP update loop
-  useEffect(() => {
-    if (!pipOpen || !pipWindowRef.current) return;
-    const w = pipWindowRef.current;
-    const id = setInterval(() => {
-      try {
-        const el = w.document.getElementById("pip-time");
-        if (el) el.textContent = formatTime(msRef.current);
-        const statusEl = w.document.getElementById("pip-status");
-        if (statusEl) statusEl.textContent = running ? "Running" : "Paused";
-      } catch { /* window closed */ }
-    }, 100);
-    return () => clearInterval(id);
-  }, [pipOpen, running]);
+  /* ─── True PiP using Canvas ─── */
+  const pipAnimRef = useRef<number>();
 
-  const openPip = useCallback(() => {
-    const w = window.open("", "stopwatch_pip", "width=320,height=200,top=100,left=100,toolbar=no,menubar=no,resizable=yes");
+  const drawPipCanvas = useCallback(() => {
+    const canvas = pipCanvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.fillStyle = "#1a1a2e";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = "#ffffff60";
+    ctx.font = "12px system-ui";
+    ctx.textAlign = "center";
+    ctx.fillText(mode === "stopwatch" ? "STOPWATCH" : "TIMER", canvas.width / 2, 30);
+
+    ctx.fillStyle = "#eeeeee";
+    ctx.font = "bold 36px monospace";
+    ctx.fillText(formatTime(msRef.current), canvas.width / 2, 75);
+
+    ctx.fillStyle = running ? "#4ade80" : "#facc15";
+    ctx.font = "11px system-ui";
+    ctx.fillText(running ? "● Running" : "❚❚ Paused", canvas.width / 2, 100);
+
+    pipAnimRef.current = requestAnimationFrame(drawPipCanvas);
+  }, [mode, running]);
+
+  const openPip = useCallback(async () => {
+    try {
+      const canvas = pipCanvasRef.current;
+      const video = pipVideoRef.current;
+      if (!canvas || !video) return;
+
+      canvas.width = 300;
+      canvas.height = 120;
+
+      const stream = canvas.captureStream(30);
+      video.srcObject = stream;
+      await video.play();
+      await (video as any).requestPictureInPicture();
+
+      pipAnimRef.current = requestAnimationFrame(drawPipCanvas);
+      setPipOpen(true);
+
+      video.addEventListener("leavepictureinpicture", () => {
+        cancelAnimationFrame(pipAnimRef.current!);
+        video.srcObject = null;
+        setPipOpen(false);
+      }, { once: true });
+    } catch {
+      // PiP not supported, silently fail
+    }
+  }, [drawPipCanvas]);
+
+  const closePip = useCallback(() => {
+    if (document.pictureInPictureElement) {
+      document.exitPictureInPicture();
+    }
+    cancelAnimationFrame(pipAnimRef.current!);
+    setPipOpen(false);
+  }, []);
+
+  // Update draw loop when running/mode changes
+  useEffect(() => {
+    if (pipOpen) {
+      cancelAnimationFrame(pipAnimRef.current!);
+      pipAnimRef.current = requestAnimationFrame(drawPipCanvas);
+    }
+  }, [pipOpen, running, mode, drawPipCanvas]);
+
+  /* ─── Popup Window ─── */
+  const openPopup = useCallback(() => {
+    const w = window.open("", "stopwatch_popup", "width=320,height=200,top=100,left=100,toolbar=no,menubar=no,resizable=yes");
     if (!w) return;
-    pipWindowRef.current = w;
+    popupWindowRef.current = w;
     w.document.write(`
       <!DOCTYPE html><html><head><title>Stopwatch</title>
       <style>
@@ -90,23 +149,47 @@ const StopwatchTimer = () => {
       </body></html>
     `);
     w.document.close();
-    w.addEventListener("beforeunload", () => setPipOpen(false));
-    setPipOpen(true);
+    w.addEventListener("beforeunload", () => setPopupOpen(false));
+    setPopupOpen(true);
   }, [mode, ms, running]);
 
-  const closePip = () => {
-    pipWindowRef.current?.close();
-    pipWindowRef.current = null;
-    setPipOpen(false);
+  const closePopup = () => {
+    popupWindowRef.current?.close();
+    popupWindowRef.current = null;
+    setPopupOpen(false);
   };
+
+  // Update popup window
+  useEffect(() => {
+    if (!popupOpen || !popupWindowRef.current) return;
+    const w = popupWindowRef.current;
+    const id = setInterval(() => {
+      try {
+        const el = w.document.getElementById("pip-time");
+        if (el) el.textContent = formatTime(msRef.current);
+        const statusEl = w.document.getElementById("pip-status");
+        if (statusEl) statusEl.textContent = running ? "Running" : "Paused";
+      } catch { /* window closed */ }
+    }, 100);
+    return () => clearInterval(id);
+  }, [popupOpen, running]);
 
   return (
     <div className="space-y-4">
+      {/* Hidden elements for true PiP */}
+      <canvas ref={pipCanvasRef} className="hidden" />
+      <video ref={pipVideoRef} className="hidden" muted playsInline />
+
       <div className="flex items-center justify-between">
         <h2 className="tool-title">Stopwatch & Timer</h2>
-        <button onClick={pipOpen ? closePip : openPip} className={pipOpen ? "tool-btn text-xs" : "tool-btn-outline text-xs"}>
-          {pipOpen ? <><X className="w-3 h-3" /> Close PiP</> : <><PictureInPicture2 className="w-3.5 h-3.5" /> PiP Mode</>}
-        </button>
+        <div className="flex gap-1.5">
+          <button onClick={pipOpen ? closePip : openPip} className={pipOpen ? "tool-btn text-xs" : "tool-btn-outline text-xs"} title="Picture-in-Picture (overlay)">
+            {pipOpen ? <><X className="w-3 h-3" /> PiP</> : <><PictureInPicture2 className="w-3.5 h-3.5" /> PiP</>}
+          </button>
+          <button onClick={popupOpen ? closePopup : openPopup} className={popupOpen ? "tool-btn text-xs" : "tool-btn-outline text-xs"} title="Open in popup window">
+            {popupOpen ? <><X className="w-3 h-3" /> Popup</> : <><ExternalLink className="w-3.5 h-3.5" /> Popup</>}
+          </button>
+        </div>
       </div>
 
       <div className="flex gap-2">
