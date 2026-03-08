@@ -73,7 +73,12 @@ const RegexHelper = () => {
     <div className="space-y-4">
       <h2 className="tool-title">Regex Helper</h2>
       <p className="tool-description">Test, build, and debug regular expressions</p>
-
+      <HowToUse steps={[
+        "Enter a regex pattern in the Pattern field (without / delimiters).",
+        "Add flags (g, i, m, s) as needed using the flag input.",
+        "Type your test string in the text area below.",
+        "Matches will be highlighted in real-time. Use common patterns for quick start.",
+      ]} title="How to use?" />
       {/* Pattern input */}
       <div className="tool-card !p-4 space-y-3">
         <div className="flex gap-2 items-end">

@@ -188,9 +188,17 @@ const WooCsvGenerator = () => {
   return (
     <div className="animate-fade-in">
       <h1 className="tool-title">WooCommerce CSV Generator</h1>
-      <p className="tool-description mb-6">
+      <p className="tool-description mb-4">
         Create WooCommerce-compatible CSV files for bulk product import. Supports simple &amp; variable products.
       </p>
+      <HowToUse steps={[
+        "Click 'Add Product' to create a new product entry.",
+        "Choose between Simple (single item) or Variable (with weight/size variations) product type.",
+        "Fill in product details: name, SKU, price, category, etc.",
+        "For variable products, add variations with different weights and prices.",
+        "Review your products in the list, then click 'Generate CSV' to download the file.",
+        "Import the CSV file in WordPress → WooCommerce → Products → Import.",
+      ]} title="How to use?" />
 
       {/* Product list */}
       <div className="tool-card mb-4">

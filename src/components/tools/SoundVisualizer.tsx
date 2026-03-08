@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback } from "react";
 import { Mic, Square, CircleDot, ExternalLink, AlertCircle, CheckCircle2, Info, ImagePlus, X, Music } from "lucide-react";
 import { useAudioVisualizer, type VisualizerStyle, type ThemeName } from "@/hooks/useAudioVisualizer";
+import HowToUse from "./HowToUse";
 
 const STYLES: { id: VisualizerStyle; label: string; icon: string }[] = [
   { id: "bars", label: "Bars", icon: "📊" },
