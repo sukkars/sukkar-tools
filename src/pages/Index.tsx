@@ -73,7 +73,7 @@ const toolComponents: Record<string, React.FC> = {
 const HowToUseSection = ({ steps }: { steps: string[] }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="mt-6 rounded-lg border border-border overflow-hidden">
+    <div className="mt-8 rounded-lg border border-border overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors"
