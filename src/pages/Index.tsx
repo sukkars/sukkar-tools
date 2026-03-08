@@ -392,6 +392,8 @@ const Index = () => {
                   </div>
                 </div>
               )}
+
+              {categories.map((cat) => {
                 const catTools = filteredTools.filter((t) => t.category === cat.id);
                 if (catTools.length === 0) return null;
                 return (
