@@ -285,67 +285,70 @@ const M3uPlayer = () => {
 
       <audio ref={audioRef} onEnded={next} onError={() => setError("Stream failed to load")} />
 
-      {/* Controls card */}
-      <div className="tool-card !p-4 space-y-3">
-        <div className="text-center">
-          <div className="text-sm text-muted-foreground">Now Playing</div>
-          <div className="font-semibold truncate">{playing ? (activeChannel?.name || streamUrl || "—") : "—"}</div>
-          {playing && activeChannel?.qualities && (
-            <div className="text-xs text-primary mt-0.5">{activeChannel.qualities[activeQuality]?.label || "Default"}</div>
-          )}
-        </div>
-
-        <div className="flex items-center justify-center gap-3">
-          {mode === "playlist" && <button onClick={prev} disabled={channels.length === 0} className="p-2 rounded-lg hover:bg-muted disabled:opacity-40"><SkipBack className="w-5 h-5" /></button>}
+      {/* Compact controls bar */}
+      <div className="tool-card !p-2.5 space-y-1.5">
+        {/* Now playing + main controls in one row */}
+        <div className="flex items-center gap-2">
+          {mode === "playlist" && <button onClick={prev} disabled={channels.length === 0} className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-40"><SkipBack className="w-4 h-4" /></button>}
           {playing ? (
-            <button onClick={handlePause} className="tool-btn !rounded-full !p-3"><Pause className="w-5 h-5" /></button>
+            <button onClick={handlePause} className="tool-btn !rounded-full !p-2"><Pause className="w-4 h-4" /></button>
           ) : (
-            <button onClick={handlePlay} disabled={!currentUrl} className="tool-btn !rounded-full !p-3 disabled:opacity-40"><Play className="w-5 h-5" /></button>
+            <button onClick={handlePlay} disabled={!currentUrl} className="tool-btn !rounded-full !p-2 disabled:opacity-40"><Play className="w-4 h-4" /></button>
           )}
-          {mode === "playlist" && <button onClick={next} disabled={channels.length === 0} className="p-2 rounded-lg hover:bg-muted disabled:opacity-40"><SkipForward className="w-5 h-5" /></button>}
-        </div>
+          {mode === "playlist" && <button onClick={next} disabled={channels.length === 0} className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-40"><SkipForward className="w-4 h-4" /></button>}
 
-        {/* Extra controls row */}
-        <div className="flex items-center justify-center gap-2">
-          <button onClick={changeSpeed} className="text-xs font-mono px-2 py-1 rounded-md bg-muted hover:bg-muted/80 transition-colors">{playbackRate}x</button>
-          {activeChannel?.qualities && (
-            <div className="relative">
-              <button onClick={() => setShowQuality(!showQuality)} className="text-xs px-2 py-1 rounded-md bg-muted hover:bg-muted/80 flex items-center gap-1">
-                <Settings className="w-3 h-3" /> Quality
+          <div className="flex-1 min-w-0 px-1">
+            <div className="text-sm font-medium truncate">{playing ? (activeChannel?.name || streamUrl || "—") : "No stream"}</div>
+            {playing && activeChannel?.qualities && (
+              <div className="text-[10px] text-primary">{activeChannel.qualities[activeQuality]?.label}</div>
+            )}
+          </div>
+
+          {/* Inline mini controls */}
+          <div className="flex items-center gap-1 flex-shrink-0">
+            <button onClick={changeSpeed} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80">{playbackRate}x</button>
+            {activeChannel?.qualities && (
+              <div className="relative">
+                <button onClick={() => setShowQuality(!showQuality)} className="p-1.5 rounded hover:bg-muted" title="Quality / Source">
+                  <Settings className="w-3.5 h-3.5" />
+                </button>
+                {showQuality && (
+                  <div className="absolute bottom-8 right-0 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[130px] z-10">
+                    <div className="px-3 py-1 text-[10px] font-semibold uppercase text-muted-foreground tracking-wider">Source / Quality</div>
+                    {activeChannel.qualities.map((q, qi) => (
+                      <button key={qi} onClick={() => switchQuality(qi)}
+                        className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted ${qi === activeQuality ? "text-primary font-medium" : ""}`}>
+                        {q.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Volume toggle with hover slider */}
+            <div className="relative group/vol">
+              <button onClick={() => setMuted(!muted)} className="p-1.5 rounded hover:bg-muted">
+                {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
               </button>
-              {showQuality && (
-                <div className="absolute bottom-8 left-0 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[120px] z-10">
-                  {activeChannel.qualities.map((q, qi) => (
-                    <button key={qi} onClick={() => switchQuality(qi)}
-                      className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted ${qi === activeQuality ? "text-primary font-medium" : ""}`}>
-                      {q.label}
-                    </button>
-                  ))}
-                </div>
-              )}
+              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/vol:flex flex-col items-center bg-popover border border-border rounded-lg shadow-lg p-2 z-10">
+                <input type="range" min={0} max={100} value={muted ? 0 : volume}
+                  onChange={(e) => { setVolume(Number(e.target.value)); setMuted(false); }}
+                  className="w-20 h-1.5 rounded-full bg-muted appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
+                  style={{ writingMode: "horizontal-tb" }} />
+                <span className="text-[10px] font-mono text-muted-foreground mt-1">{muted ? 0 : volume}%</span>
+              </div>
             </div>
-          )}
-          {isVideo && playing && (
-            <>
-              <button onClick={openPiP} className="text-xs px-2 py-1 rounded-md bg-muted hover:bg-muted/80 flex items-center gap-1">
-                <PictureInPicture2 className="w-3 h-3" /> PiP
-              </button>
-              <button onClick={toggleFullscreen} className="text-xs px-2 py-1 rounded-md bg-muted hover:bg-muted/80 flex items-center gap-1">
-                {fullscreen ? <Minimize2 className="w-3 h-3" /> : <Maximize2 className="w-3 h-3" />} Fullscreen
-              </button>
-            </>
-          )}
-        </div>
-
-        {/* Volume */}
-        <div className="flex items-center gap-3">
-          <button onClick={() => setMuted(!muted)} className="text-muted-foreground hover:text-foreground">
-            {muted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-          </button>
-          <input type="range" min={0} max={100} value={muted ? 0 : volume}
-            onChange={(e) => { setVolume(Number(e.target.value)); setMuted(false); }}
-            className="flex-1 h-2 rounded-full bg-muted appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary" />
-          <span className="text-xs font-mono text-muted-foreground w-8">{muted ? 0 : volume}%</span>
+            {isVideo && playing && (
+              <>
+                <button onClick={openPiP} className="p-1.5 rounded hover:bg-muted" title="Picture-in-Picture">
+                  <PictureInPicture2 className="w-3.5 h-3.5" />
+                </button>
+                <button onClick={toggleFullscreen} className="p-1.5 rounded hover:bg-muted" title="Fullscreen">
+                  {fullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
+                </button>
+              </>
+            )}
+          </div>
         </div>
       </div>
 

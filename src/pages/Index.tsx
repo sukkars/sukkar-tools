@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { tools, categories } from "@/lib/tools";
-import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
+import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp, Settings2, Key, AlertTriangle } from "lucide-react";
 import TextCaseConverter from "@/components/tools/TextCaseConverter";
 import WordCounter from "@/components/tools/WordCounter";
 import PasswordGenerator from "@/components/tools/PasswordGenerator";
@@ -73,7 +73,7 @@ const toolComponents: Record<string, React.FC> = {
 const HowToUseSection = ({ steps }: { steps: string[] }) => {
   const [open, setOpen] = useState(false);
   return (
-    <div className="mt-6 rounded-lg border border-border overflow-hidden">
+    <div className="mt-8 rounded-lg border border-border overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium hover:bg-muted/50 transition-colors"
@@ -95,7 +95,66 @@ const HowToUseSection = ({ steps }: { steps: string[] }) => {
   );
 };
 
-/* ─── Footer ─── */
+/* ─── API Settings Panel ─── */
+const ApiSettingsPanel = ({ onClose }: { onClose: () => void }) => {
+  const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem("gemini_api_key") || "");
+  const [steadfastKey, setSteadfastKey] = useState(() => localStorage.getItem("steadfast_api_key") || "");
+  const [steadfastSecret, setSteadfastSecret] = useState(() => localStorage.getItem("steadfast_secret_key") || "");
+
+  const save = () => {
+    localStorage.setItem("gemini_api_key", geminiKey);
+    localStorage.setItem("steadfast_api_key", steadfastKey);
+    localStorage.setItem("steadfast_secret_key", steadfastSecret);
+    onClose();
+  };
+
+  return (
+    <div className="fixed inset-0 bg-foreground/30 z-[60] flex items-center justify-center p-4" onClick={onClose}>
+      <div className="bg-background border border-border rounded-xl shadow-2xl w-full max-w-md p-5 space-y-4" onClick={e => e.stopPropagation()}>
+        <div className="flex items-center gap-2">
+          <Key className="w-5 h-5 text-primary" />
+          <h3 className="font-bold text-lg">API Settings</h3>
+        </div>
+        <p className="text-xs text-muted-foreground">কিছু টুলের জন্য API key প্রয়োজন। আপনার key ব্রাউজারে সংরক্ষিত থাকবে, কোথাও পাঠানো হয় না।</p>
+
+        <div className="space-y-3">
+          <div>
+            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Google Gemini API Key <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">AI Bulk Booking</span></label>
+            <input value={geminiKey} onChange={e => setGeminiKey(e.target.value)} placeholder="AIza..." className="tool-input w-full text-sm" type="password" />
+            <p className="text-[11px] text-muted-foreground mt-0.5">ফ্রি পেতে: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" className="text-primary hover:underline">aistudio.google.com</a></p>
+          </div>
+          <div>
+            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Steadfast API Key</label>
+            <input value={steadfastKey} onChange={e => setSteadfastKey(e.target.value)} placeholder="API Key" className="tool-input w-full text-sm" type="password" />
+          </div>
+          <div>
+            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Steadfast Secret Key</label>
+            <input value={steadfastSecret} onChange={e => setSteadfastSecret(e.target.value)} placeholder="Secret Key" className="tool-input w-full text-sm" type="password" />
+          </div>
+        </div>
+
+        <div className="flex gap-2 pt-1">
+          <button onClick={save} className="tool-btn flex-1">Save</button>
+          <button onClick={onClose} className="tool-btn-outline flex-1">Cancel</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+/* ─── API Note below tool ─── */
+const ApiNote = ({ tool }: { tool: typeof tools[0] }) => {
+  if (!tool.requiresApi) return null;
+  const hasKey = !!localStorage.getItem(tool.requiresApi.key);
+  return (
+    <div className={`mt-3 flex items-center gap-2 text-xs rounded-lg px-3 py-2 border ${hasKey ? "border-primary/20 bg-primary/5 text-primary" : "border-yellow-500/20 bg-yellow-500/5 text-yellow-600 dark:text-yellow-400"}`}>
+      {hasKey ? <Key className="w-3.5 h-3.5 flex-shrink-0" /> : <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />}
+      <span>{hasKey ? `${tool.requiresApi.name} key সেট আছে।` : `এই টুলের জন্য ${tool.requiresApi.name} প্রয়োজন। উপরের ⚙️ Settings থেকে সেট করুন।`}</span>
+    </div>
+  );
+};
+
+
 const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
   const [showGuide, setShowGuide] = useState(false);
   const activeTool = toolTitle ? tools.find(t => t.title === toolTitle) : null;
@@ -135,6 +194,7 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
 
   const ActiveComponent = activeTool ? toolComponents[activeTool] : null;
   const activeToolDef = activeTool ? tools.find(t => t.id === activeTool) : null;
@@ -234,12 +294,17 @@ const Index = () => {
               </div>
             </div>
           )}
+          <button onClick={() => setShowSettings(true)} className="ml-auto p-2 rounded-lg hover:bg-muted transition-colors" title="API Settings">
+            <Settings2 className="w-4 h-4 text-muted-foreground" />
+          </button>
         </header>
-
+        {showSettings && <ApiSettingsPanel onClose={() => setShowSettings(false)} />}
         <div className="flex-1 p-4 sm:p-6 lg:p-8">
           {ActiveComponent ? (
             <div className="max-w-4xl">
               <ActiveComponent />
+              {/* API note if needed */}
+              {activeToolDef && <ApiNote tool={activeToolDef} />}
               {/* How To Use below every tool */}
               {activeToolDef && <HowToUseSection steps={activeToolDef.howToUse} />}
               {/* Footer */}
