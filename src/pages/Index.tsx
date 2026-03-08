@@ -160,6 +160,44 @@ const ApiNote = ({ tool }: { tool: typeof tools[0] }) => {
 };
 
 
+const FeedbackSection = () => {
+  const [subject, setSubject] = useState("");
+  const [body, setBody] = useState("");
+  const [sent, setSent] = useState(false);
+
+  const handleSend = () => {
+    const mailto = `mailto:wapmahmud@duck.com?subject=${encodeURIComponent(subject || "Sukkar Toolbox Feedback")}&body=${encodeURIComponent(body)}`;
+    window.open(mailto, "_blank");
+    setSent(true);
+    setTimeout(() => setSent(false), 3000);
+  };
+
+  return (
+    <div className="tool-card !p-5 space-y-3">
+      <h3 className="font-semibold flex items-center gap-2">
+        <Mail className="w-4 h-4" /> Feedback / যোগাযোগ
+      </h3>
+      <p className="text-xs text-muted-foreground">আপনার মতামত বা পরামর্শ জানান। আপনার ইমেইল ক্লায়েন্ট খুলে মেইল পাঠাতে পারবেন।</p>
+      <input
+        type="text"
+        placeholder="বিষয় (Subject)"
+        value={subject}
+        onChange={(e) => setSubject(e.target.value)}
+        className="tool-input w-full"
+      />
+      <textarea
+        placeholder="আপনার মতামত লিখুন..."
+        value={body}
+        onChange={(e) => setBody(e.target.value)}
+        className="tool-textarea min-h-[80px]"
+      />
+      <button onClick={handleSend} disabled={!body.trim()} className="tool-btn text-sm">
+        {sent ? "✓ মেইল ক্লায়েন্ট ওপেন হয়েছে" : "মেইল পাঠান"}
+      </button>
+    </div>
+  );
+};
+
 const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
   return (
     <footer className="mt-8 pt-4 border-t border-border text-center space-y-2">
