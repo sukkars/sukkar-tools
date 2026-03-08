@@ -1,4 +1,4 @@
-import { Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint, Code, MessageCircle, StickyNote, Table } from "lucide-react";
+import { Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint, Code, MessageCircle, StickyNote, Table, AudioWaveform } from "lucide-react";
 
 export interface ToolDef {
   id: string;
@@ -25,6 +25,7 @@ export const tools: ToolDef[] = [
   { id: "qr", title: "QR Code", description: "Generate QR codes", icon: QrCode, category: "generators" },
   { id: "whatsapp", title: "WhatsApp Link", description: "Generate WA links", icon: MessageCircle, category: "generators" },
   { id: "notes", title: "Fresh Notes", description: "Quick local notepad", icon: StickyNote, category: "productivity" },
+  { id: "sound-viz", title: "Sound Visualizer", description: "Mic visualizer & recorder", icon: AudioWaveform, category: "productivity" },
 ];
 
 export const categories = [

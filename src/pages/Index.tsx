@@ -17,6 +17,7 @@ import HtmlBBCodeConverter from "@/components/tools/HtmlBBCodeConverter";
 import WhatsAppLinkGenerator from "@/components/tools/WhatsAppLinkGenerator";
 import FreshNotes from "@/components/tools/FreshNotes";
 import CsvGenerator from "@/components/tools/CsvGenerator";
+import SoundVisualizer from "@/components/tools/SoundVisualizer";
 
 const toolComponents: Record<string, React.FC> = {
   "text-case": TextCaseConverter,
@@ -35,6 +36,7 @@ const toolComponents: Record<string, React.FC> = {
   whatsapp: WhatsAppLinkGenerator,
   notes: FreshNotes,
   csv: CsvGenerator,
+  "sound-viz": SoundVisualizer,
 };
 
 const Index = () => {
