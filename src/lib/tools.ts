@@ -1,7 +1,7 @@
 import {
   Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint,
   Code, MessageCircle, StickyNote, Table, AudioWaveform, Calculator, Heart, Volume2, Mic, Keyboard,
-  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio, FileCode2
+  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio, FileCode2, Package
 } from "lucide-react";
 
 export interface ToolDef {
@@ -57,6 +57,7 @@ export const tools: ToolDef[] = [
   // Productivity
   { id: "notes", title: "Fresh Notes", description: "Quick local notepad", icon: StickyNote, category: "productivity" },
   { id: "stopwatch", title: "Stopwatch & Timer", description: "Track time", icon: Timer, category: "productivity" },
+  { id: "steadfast", title: "Steadfast Booking", description: "Courier booking tool", icon: Package, category: "productivity" },
 ];
 
 export const categories = [
