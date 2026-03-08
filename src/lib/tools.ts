@@ -1,7 +1,7 @@
 import {
   Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint,
   Code, MessageCircle, StickyNote, Table, AudioWaveform, Calculator, Heart, Volume2, Mic, Keyboard,
-  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio
+  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio, FileCode2
 } from "lucide-react";
 
 export interface ToolDef {
@@ -24,6 +24,7 @@ export const tools: ToolDef[] = [
   // Developer
   { id: "json", title: "JSON Formatter", description: "Prettify & minify", icon: Braces, category: "dev" },
   { id: "base64", title: "Base64", description: "Encode & decode", icon: Binary, category: "dev" },
+  { id: "data-encoder", title: "Data Encoder", description: "Base16/32/64/85, Binary, URL", icon: FileCode2, category: "dev" },
   { id: "uuid", title: "UUID Generator", description: "Random UUIDs", icon: Fingerprint, category: "dev" },
   { id: "html-bbcode", title: "HTML → BBCode", description: "Convert HTML to BBCode", icon: Code, category: "dev" },
   { id: "woo-csv", title: "WooCommerce CSV", description: "WooCommerce product import CSV", icon: Table, category: "generators" },

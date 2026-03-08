@@ -31,6 +31,7 @@ import ImageResizer from "@/components/tools/ImageResizer";
 import InvoiceGenerator from "@/components/tools/InvoiceGenerator";
 import RegexHelper from "@/components/tools/RegexHelper";
 import M3uPlayer from "@/components/tools/M3uPlayer";
+import DataEncoder from "@/components/tools/DataEncoder";
 
 const toolComponents: Record<string, React.FC> = {
   "text-case": TextCaseConverter,
@@ -38,6 +39,7 @@ const toolComponents: Record<string, React.FC> = {
   password: PasswordGenerator,
   json: JsonFormatter,
   base64: Base64Tool,
+  "data-encoder": DataEncoder,
   color: ColorPicker,
   lorem: LoremIpsumGenerator,
   units: UnitConverter,
