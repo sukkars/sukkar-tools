@@ -57,6 +57,7 @@ export const tools: ToolDef[] = [
   // Productivity
   { id: "notes", title: "Fresh Notes", description: "Quick local notepad", icon: StickyNote, category: "productivity" },
   { id: "stopwatch", title: "Stopwatch & Timer", description: "Track time", icon: Timer, category: "productivity" },
+  { id: "steadfast", title: "Steadfast Booking", description: "Courier booking tool", icon: Package, category: "productivity" },
 ];
 
 export const categories = [
