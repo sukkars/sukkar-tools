@@ -11,6 +11,7 @@ export interface ToolDef {
   icon: React.ElementType;
   category: "text" | "dev" | "converters" | "generators" | "productivity" | "media" | "calculators";
   howToUse: string[];
+  howToUseEn: string[];
   requiresApi?: { name: string; key: string; optional?: boolean; description: string };
 }
 
