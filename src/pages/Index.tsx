@@ -303,6 +303,8 @@ const Index = () => {
           {ActiveComponent ? (
             <div className="max-w-4xl">
               <ActiveComponent />
+              {/* API note if needed */}
+              {activeToolDef && <ApiNote tool={activeToolDef} />}
               {/* How To Use below every tool */}
               {activeToolDef && <HowToUseSection steps={activeToolDef.howToUse} />}
               {/* Footer */}
