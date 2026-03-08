@@ -48,7 +48,7 @@ const toolComponents: Record<string, React.FC> = {
   "html-bbcode": HtmlBBCodeConverter,
   whatsapp: WhatsAppLinkGenerator,
   notes: FreshNotes,
-  csv: CsvGenerator,
+  "woo-csv": WooCsvGenerator,
   "sound-viz": SoundVisualizer,
   calculator: Calculator,
   bmi: BmiCalculator,
