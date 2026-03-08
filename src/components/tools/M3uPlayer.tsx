@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Upload, Trash2, List, Radio, PictureInPicture2, Maximize2, Minimize2, Settings, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
+import HowToUse from "./HowToUse";
 
 interface Channel {
   name: string;
