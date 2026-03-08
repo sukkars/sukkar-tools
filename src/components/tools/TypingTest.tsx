@@ -73,6 +73,7 @@ const TypingTest = () => {
   const [elapsed, setElapsed] = useState(0);
   const [duration, setDuration] = useState(60);
   const timerRef = useRef<ReturnType<typeof setInterval>>();
+  const [customText, setCustomText] = useState("");
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   const filteredSamples = SAMPLES.filter((s) => langFilter === "all" || s.lang === langFilter);
