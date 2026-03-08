@@ -184,7 +184,7 @@ const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
         <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary">sukkarshop.com</a>
       </p>
       <p className="text-[11px] text-muted-foreground/70">
-        সব টুল আপনার ব্রাউজারে চলে — কোনো ডেটা সার্ভারে পাঠানো হয় না। ব্যবহার সম্পূর্ণ আপনার দায়িত্বে।
+        All tools run entirely in your browser — no data is sent to any server. Use at your own responsibility.
       </p>
     </footer>
   );
