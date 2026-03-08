@@ -28,6 +28,7 @@ export const tools: ToolDef[] = [
   { id: "html-bbcode", title: "HTML → BBCode", description: "Convert HTML to BBCode", icon: Code, category: "dev" },
   { id: "csv", title: "CSV Generator", description: "Build & download CSV", icon: Table, category: "dev" },
   { id: "hash", title: "Hash Generator", description: "SHA-1, SHA-256, SHA-512", icon: ShieldCheck, category: "dev" },
+  { id: "regex", title: "Regex Helper", description: "Test & build regex", icon: Regex, category: "dev" },
 
   // Converters
   { id: "color", title: "Color Picker", description: "HEX, RGB, HSL", icon: Palette, category: "converters" },
