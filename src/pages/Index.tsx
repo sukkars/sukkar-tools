@@ -29,6 +29,8 @@ import HashGenerator from "@/components/tools/HashGenerator";
 import BarcodeGenerator from "@/components/tools/BarcodeGenerator";
 import ImageResizer from "@/components/tools/ImageResizer";
 import InvoiceGenerator from "@/components/tools/InvoiceGenerator";
+import RegexHelper from "@/components/tools/RegexHelper";
+import M3uPlayer from "@/components/tools/M3uPlayer";
 
 const toolComponents: Record<string, React.FC> = {
   "text-case": TextCaseConverter,
