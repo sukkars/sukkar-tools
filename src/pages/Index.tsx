@@ -66,6 +66,7 @@ const toolComponents: Record<string, React.FC> = {
   invoice: InvoiceGenerator,
   regex: RegexHelper,
   m3u: M3uPlayer,
+  steadfast: SteadfastBooking,
 };
 
 const Index = () => {
