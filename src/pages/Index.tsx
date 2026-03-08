@@ -194,6 +194,7 @@ const Index = () => {
   const [activeTool, setActiveTool] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const [showSettings, setShowSettings] = useState(false);
 
   const ActiveComponent = activeTool ? toolComponents[activeTool] : null;
   const activeToolDef = activeTool ? tools.find(t => t.id === activeTool) : null;
