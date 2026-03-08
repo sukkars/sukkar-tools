@@ -174,7 +174,7 @@ const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
       {showGuide && activeTool && (
         <div className="text-left max-w-lg mx-auto bg-muted/20 border border-border rounded-lg p-3 mt-2">
           <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground">
-            {activeTool.howToUse.map((step, i) => <li key={i}>{step}</li>)}
+            {activeTool.howToUseEn.map((step, i) => <li key={i}>{step}</li>)}
           </ol>
         </div>
       )}
