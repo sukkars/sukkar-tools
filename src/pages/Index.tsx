@@ -70,7 +70,7 @@ const toolComponents: Record<string, React.FC> = {
 };
 
 /* ─── How To Use (inline collapsible) ─── */
-const HowToUseSection = ({ steps }: { steps: string[] }) => {
+const HowToUseSection = ({ stepsBn, stepsEn }: { stepsBn: string[]; stepsEn: string[] }) => {
   const [open, setOpen] = useState(false);
   return (
     <div className="mt-8 rounded-lg border border-border overflow-hidden">
@@ -80,14 +80,18 @@ const HowToUseSection = ({ steps }: { steps: string[] }) => {
       >
         <span className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-primary" />
-          কিভাবে ব্যবহার করবেন?
+          কিভাবে ব্যবহার করবেন? (⁉️ How to use?)
         </span>
         {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
       </button>
       {open && (
-        <div className="px-4 pb-3 pt-1 border-t border-border bg-muted/20">
+        <div className="px-4 pb-3 pt-2 border-t border-border bg-muted/20 space-y-3">
           <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground">
-            {steps.map((step, i) => <li key={i}>{step}</li>)}
+            {stepsBn.map((step, i) => <li key={i}>{step}</li>)}
+          </ol>
+          <hr className="border-border" />
+          <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground/70">
+            {stepsEn.map((step, i) => <li key={i}>{step}</li>)}
           </ol>
         </div>
       )}
@@ -155,29 +159,13 @@ const ApiNote = ({ tool }: { tool: typeof tools[0] }) => {
 
 
 const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
-  const [showGuide, setShowGuide] = useState(false);
-  const activeTool = toolTitle ? tools.find(t => t.title === toolTitle) : null;
-
   return (
     <footer className="mt-8 pt-4 border-t border-border text-center space-y-2">
       <div className="flex items-center justify-center gap-2 flex-wrap text-sm">
         <a href="/" className="hover:text-primary transition-colors">🛠️ Tools</a>
         <span className="text-muted-foreground">|</span>
         <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary transition-colors">🏠 Homepage</a>
-        {activeTool && (
-          <>
-            <span className="text-muted-foreground">|</span>
-            <button onClick={() => setShowGuide(!showGuide)} className="hover:text-primary transition-colors">⁉️ How to use?</button>
-          </>
-        )}
       </div>
-      {showGuide && activeTool && (
-        <div className="text-left max-w-lg mx-auto bg-muted/20 border border-border rounded-lg p-3 mt-2">
-          <ol className="list-decimal list-inside space-y-1.5 text-sm text-muted-foreground">
-            {activeTool.howToUseEn.map((step, i) => <li key={i}>{step}</li>)}
-          </ol>
-        </div>
-      )}
       <p className="text-xs text-muted-foreground">
         <strong>{toolTitle || "Sukkar Toolbox"}</strong> v1.0 | Powered by{" "}
         <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary">sukkarshop.com</a>
@@ -318,10 +306,8 @@ const Index = () => {
           {ActiveComponent ? (
             <div className="max-w-4xl">
               <ActiveComponent />
-              {/* API note if needed */}
-              {activeToolDef && <ApiNote tool={activeToolDef} />}
               {/* How To Use below every tool */}
-              {activeToolDef && <HowToUseSection steps={activeToolDef.howToUse} />}
+              {activeToolDef && <HowToUseSection stepsBn={activeToolDef.howToUse} stepsEn={activeToolDef.howToUseEn} />}
               {/* Footer */}
               <ToolFooter toolTitle={activeToolDef?.title} />
             </div>
