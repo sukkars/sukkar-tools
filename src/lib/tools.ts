@@ -1,7 +1,7 @@
 import {
   Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint,
   Code, MessageCircle, StickyNote, Table, AudioWaveform, Calculator, Heart, Volume2, Mic, Keyboard,
-  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio, FileCode2
+  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio, FileCode2, Package
 } from "lucide-react";
 
 export interface ToolDef {
