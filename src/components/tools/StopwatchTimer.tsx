@@ -1,16 +1,25 @@
-import { useState, useRef, useEffect } from "react";
-import { Play, Pause, RotateCcw, Flag } from "lucide-react";
+import { useState, useRef, useEffect, useCallback } from "react";
+import { Play, Pause, RotateCcw, Flag, PictureInPicture2, X } from "lucide-react";
 
 const StopwatchTimer = () => {
   const [mode, setMode] = useState<"stopwatch" | "timer">("stopwatch");
   const [ms, setMs] = useState(0);
   const [running, setRunning] = useState(false);
   const [laps, setLaps] = useState<number[]>([]);
-  const [timerInput, setTimerInput] = useState(300); // 5min default
+  const [timerInput, setTimerInput] = useState(300);
+  const [pipOpen, setPipOpen] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval>>();
   const startRef = useRef(0);
+  const pipWindowRef = useRef<Window | null>(null);
+  const msRef = useRef(ms);
 
-  useEffect(() => () => clearInterval(intervalRef.current), []);
+  // Keep msRef in sync
+  useEffect(() => { msRef.current = ms; }, [ms]);
+
+  useEffect(() => () => {
+    clearInterval(intervalRef.current);
+    pipWindowRef.current?.close();
+  }, []);
 
   const start = () => {
     if (mode === "timer" && ms === 0) setMs(timerInput * 1000);
@@ -47,9 +56,58 @@ const StopwatchTimer = () => {
     return `${h > 0 ? h.toString().padStart(2, "0") + ":" : ""}${m.toString().padStart(2, "0")}:${s.toString().padStart(2, "0")}.${centis.toString().padStart(2, "0")}`;
   };
 
+  // PiP update loop
+  useEffect(() => {
+    if (!pipOpen || !pipWindowRef.current) return;
+    const w = pipWindowRef.current;
+    const id = setInterval(() => {
+      try {
+        const el = w.document.getElementById("pip-time");
+        if (el) el.textContent = formatTime(msRef.current);
+        const statusEl = w.document.getElementById("pip-status");
+        if (statusEl) statusEl.textContent = running ? "Running" : "Paused";
+      } catch { /* window closed */ }
+    }, 100);
+    return () => clearInterval(id);
+  }, [pipOpen, running]);
+
+  const openPip = useCallback(() => {
+    const w = window.open("", "stopwatch_pip", "width=320,height=200,top=100,left=100,toolbar=no,menubar=no,resizable=yes");
+    if (!w) return;
+    pipWindowRef.current = w;
+    w.document.write(`
+      <!DOCTYPE html><html><head><title>Stopwatch</title>
+      <style>
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family: system-ui, sans-serif; background: #1a1a2e; color: #eee; display:flex; flex-direction:column; align-items:center; justify-content:center; height:100vh; user-select:none; }
+        #pip-time { font-size: 3rem; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: 2px; }
+        #pip-status { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 3px; opacity: 0.6; margin-top: 4px; }
+        .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.4; margin-bottom: 8px; }
+      </style></head><body>
+        <div class="label">${mode === "stopwatch" ? "Stopwatch" : "Timer"}</div>
+        <div id="pip-time">${formatTime(ms)}</div>
+        <div id="pip-status">${running ? "Running" : "Paused"}</div>
+      </body></html>
+    `);
+    w.document.close();
+    w.addEventListener("beforeunload", () => setPipOpen(false));
+    setPipOpen(true);
+  }, [mode, ms, running]);
+
+  const closePip = () => {
+    pipWindowRef.current?.close();
+    pipWindowRef.current = null;
+    setPipOpen(false);
+  };
+
   return (
     <div className="space-y-4">
-      <h2 className="tool-title">Stopwatch & Timer</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="tool-title">Stopwatch & Timer</h2>
+        <button onClick={pipOpen ? closePip : openPip} className={pipOpen ? "tool-btn text-xs" : "tool-btn-outline text-xs"}>
+          {pipOpen ? <><X className="w-3 h-3" /> Close PiP</> : <><PictureInPicture2 className="w-3.5 h-3.5" /> PiP Mode</>}
+        </button>
+      </div>
 
       <div className="flex gap-2">
         <button onClick={() => { reset(); setMode("stopwatch"); }} className={mode === "stopwatch" ? "tool-btn text-xs" : "tool-btn-outline text-xs"}>Stopwatch</button>
