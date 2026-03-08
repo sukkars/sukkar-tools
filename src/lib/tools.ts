@@ -91,6 +91,7 @@ export const tools: ToolDef[] = [
   { id: "stopwatch", title: "Stopwatch & Timer", description: "Track time", icon: Timer, category: "productivity",
     howToUse: ["Stopwatch মোডে Start/Stop/Reset করুন।", "Lap বাটনে ক্লিক করে ল্যাপ টাইম রেকর্ড করুন।", "Timer মোডে সময় সেট করে Start করুন।", "PiP Mode বাটনে ক্লিক করলে ছোট floating window-তে টাইমার দেখাবে।"] },
   { id: "steadfast", title: "Steadfast Booking", description: "Courier booking tool", icon: Package, category: "productivity",
+    requiresApi: { name: "Steadfast API", key: "steadfast_api_key", description: "Steadfast courier API key (Settings থেকে সেট করুন)" },
     howToUse: ["প্রথমে Steadfast API Key ও Secret Key সেট করুন।", "Single মোডে: কাস্টমারের মেসেজ পেস্ট করুন → প্রসেস → বুকিং কনফার্ম।", "Bulk মোডে: একাধিক অর্ডার --- দিয়ে আলাদা করে দিন → একসাথে বুকিং।", "AI Bulk মোডে: মেসেঞ্জারের অগোছালো মেসেজ পেস্ট করুন → AI তথ্য বের করবে।", "AI মোডের জন্য Google Gemini API Key প্রয়োজন (ফ্রি)।"] },
 ];
 
