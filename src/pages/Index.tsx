@@ -97,14 +97,12 @@ const HowToUseSection = ({ steps }: { steps: string[] }) => {
 
 /* ─── API Settings Panel ─── */
 const ApiSettingsPanel = ({ onClose }: { onClose: () => void }) => {
-  const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem("gemini_api_key") || "");
-  const [steadfastKey, setSteadfastKey] = useState(() => localStorage.getItem("steadfast_api_key") || "");
-  const [steadfastSecret, setSteadfastSecret] = useState(() => localStorage.getItem("steadfast_secret_key") || "");
+  const [geminiKey, setGeminiKey] = useState(() => localStorage.getItem("geminiApiKey_user") || "");
+  const [model, setModel] = useState(() => localStorage.getItem("geminiModel_user") || "gemini-2.5-flash-lite");
 
   const save = () => {
-    localStorage.setItem("gemini_api_key", geminiKey);
-    localStorage.setItem("steadfast_api_key", steadfastKey);
-    localStorage.setItem("steadfast_secret_key", steadfastSecret);
+    localStorage.setItem("geminiApiKey_user", geminiKey.trim());
+    localStorage.setItem("geminiModel_user", model);
     onClose();
   };
 
@@ -115,23 +113,24 @@ const ApiSettingsPanel = ({ onClose }: { onClose: () => void }) => {
           <Key className="w-5 h-5 text-primary" />
           <h3 className="font-bold text-lg">API Settings</h3>
         </div>
-        <p className="text-xs text-muted-foreground">কিছু টুলের জন্য API key প্রয়োজন। আপনার key ব্রাউজারে সংরক্ষিত থাকবে, কোথাও পাঠানো হয় না।</p>
+        <p className="text-xs text-muted-foreground">AI ফিচারের জন্য Google Gemini API key প্রয়োজন। আপনার key ব্রাউজারে সংরক্ষিত থাকবে, কোথাও পাঠানো হয় না।</p>
 
         <div className="space-y-3">
           <div>
-            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Google Gemini API Key <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">AI Bulk Booking</span></label>
+            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Google Gemini API Key <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary">AI Features</span></label>
             <input value={geminiKey} onChange={e => setGeminiKey(e.target.value)} placeholder="AIza..." className="tool-input w-full text-sm" type="password" />
             <p className="text-[11px] text-muted-foreground mt-0.5">ফ্রি পেতে: <a href="https://aistudio.google.com/apikey" target="_blank" rel="noopener" className="text-primary hover:underline">aistudio.google.com</a></p>
           </div>
           <div>
-            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Steadfast API Key</label>
-            <input value={steadfastKey} onChange={e => setSteadfastKey(e.target.value)} placeholder="API Key" className="tool-input w-full text-sm" type="password" />
-          </div>
-          <div>
-            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">Steadfast Secret Key</label>
-            <input value={steadfastSecret} onChange={e => setSteadfastSecret(e.target.value)} placeholder="Secret Key" className="tool-input w-full text-sm" type="password" />
+            <label className="text-sm font-medium flex items-center gap-1.5 mb-1">AI Model</label>
+            <select value={model} onChange={e => setModel(e.target.value)} className="tool-input w-full text-sm">
+              <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Fast, High Limit)</option>
+              <option value="gemini-3-flash-preview">Gemini 3.0 Flash Preview (Smarter, Low Limit)</option>
+            </select>
           </div>
         </div>
+
+        <p className="text-[11px] text-muted-foreground">💡 Steadfast API key আলাদাভাবে Steadfast Booking টুলের মধ্যে সেট করুন।</p>
 
         <div className="flex gap-2 pt-1">
           <button onClick={save} className="tool-btn flex-1">Save</button>
