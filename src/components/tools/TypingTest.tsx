@@ -120,47 +120,76 @@ const TypingTest = () => {
         <button onClick={reset} className="tool-btn-outline text-xs"><RotateCcw className="w-3 h-3" /> Reset</button>
       </div>
 
-      <div className="flex gap-2 items-center">
-        <label className="text-sm text-muted-foreground">Duration:</label>
-        {[30, 60, 120].map((d) => (
-          <button key={d} onClick={() => { setDuration(d); reset(); }}
-            className={d === duration ? "tool-btn text-xs !px-3 !py-1" : "tool-btn-outline text-xs !px-3 !py-1"}>
-            {d}s
-          </button>
-        ))}
-      </div>
-
-      {/* Target text display */}
-      <div className="tool-card !p-4 font-mono text-base leading-relaxed select-none">
-        {targetText.split("").map((char, i) => {
-          let cls = "text-muted-foreground";
-          if (i < input.length) {
-            cls = input[i] === char ? "text-green-500" : "text-red-500 underline";
-          } else if (i === input.length) {
-            cls = "bg-primary/20 text-foreground";
-          }
-          return <span key={i} className={cls}>{char}</span>;
-        })}
-      </div>
-
-      <textarea ref={inputRef} value={input} onChange={(e) => handleInput(e.target.value)}
-        disabled={finished} placeholder={finished ? "Test complete!" : "Start typing here..."}
-        className="tool-textarea font-mono min-h-[80px]" autoFocus />
-
-      {/* Stats */}
-      <div className="grid grid-cols-4 gap-3">
-        {[
-          { label: "Time Left", value: `${timeLeft}s` },
-          { label: "WPM", value: String(started ? wpm : 0) },
-          { label: "Accuracy", value: `${started ? accuracy : 100}%` },
-          { label: "Characters", value: `${correctChars}/${totalTyped}` },
-        ].map(({ label, value }) => (
-          <div key={label} className="tool-card !p-3 text-center">
-            <div className="text-xs text-muted-foreground">{label}</div>
-            <div className="text-xl font-bold font-mono">{value}</div>
+      {/* Text selection */}
+      {!targetText ? (
+        <div className="space-y-3">
+          <div className="flex gap-2 items-center">
+            <label className="text-sm text-muted-foreground">Language:</label>
+            {([["all", "All"], ["en", "English"], ["bn", "বাংলা"]] as const).map(([val, label]) => (
+              <button key={val} onClick={() => setLangFilter(val)}
+                className={val === langFilter ? "tool-btn text-xs !px-3 !py-1" : "tool-btn-outline text-xs !px-3 !py-1"}>
+                {label}
+              </button>
+            ))}
           </div>
-        ))}
-      </div>
+          <p className="text-sm text-muted-foreground">Select a text to start typing:</p>
+          <div className="space-y-1.5">
+            {filteredSamples.map((s, i) => (
+              <button key={i} onClick={() => selectText(i)}
+                className="w-full text-left tool-card !p-3 hover:border-primary/30 hover:-translate-y-0.5 transition-all cursor-pointer">
+                <span className="text-[10px] uppercase font-semibold text-muted-foreground mr-2">
+                  {s.lang === "en" ? "EN" : "BN"}
+                </span>
+                <span className="text-sm">{s.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      ) : (
+        <>
+          <div className="flex gap-2 items-center">
+            <label className="text-sm text-muted-foreground">Duration:</label>
+            {[30, 60, 120].map((d) => (
+              <button key={d} onClick={() => { setDuration(d); setInput(""); setStarted(false); setFinished(false); setElapsed(0); clearInterval(timerRef.current); }}
+                className={d === duration ? "tool-btn text-xs !px-3 !py-1" : "tool-btn-outline text-xs !px-3 !py-1"}>
+                {d}s
+              </button>
+            ))}
+          </div>
+
+          {/* Target text display */}
+          <div className="tool-card !p-4 font-mono text-base leading-relaxed select-none">
+            {targetText.split("").map((char, i) => {
+              let cls = "text-muted-foreground";
+              if (i < input.length) {
+                cls = input[i] === char ? "text-green-500" : "text-red-500 underline";
+              } else if (i === input.length) {
+                cls = "bg-primary/20 text-foreground";
+              }
+              return <span key={i} className={cls}>{char}</span>;
+            })}
+          </div>
+
+          <textarea ref={inputRef} value={input} onChange={(e) => handleInput(e.target.value)}
+            disabled={finished} placeholder={finished ? "Test complete!" : "Start typing here..."}
+            className="tool-textarea font-mono min-h-[80px]" autoFocus />
+
+          {/* Stats */}
+          <div className="grid grid-cols-4 gap-3">
+            {[
+              { label: "Time Left", value: `${timeLeft}s` },
+              { label: "WPM", value: String(started ? wpm : 0) },
+              { label: "Accuracy", value: `${started ? accuracy : 100}%` },
+              { label: "Characters", value: `${correctChars}/${totalTyped}` },
+            ].map(({ label, value }) => (
+              <div key={label} className="tool-card !p-3 text-center">
+                <div className="text-xs text-muted-foreground">{label}</div>
+                <div className="text-xl font-bold font-mono">{value}</div>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 };
