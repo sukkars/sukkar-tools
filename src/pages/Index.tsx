@@ -219,7 +219,9 @@ const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
 };
 
 const Index = () => {
-  const [activeTool, setActiveTool] = useState<string | null>(null);
+  const { toolId } = useParams();
+  const navigate = useNavigate();
+  const [activeTool, setActiveTool] = useState<string | null>(toolId || null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [search, setSearch] = useState("");
   const [showSettings, setShowSettings] = useState(false);
@@ -231,6 +233,11 @@ const Index = () => {
     }
     return false;
   });
+
+  // Sync activeTool with URL params
+  useEffect(() => {
+    setActiveTool(toolId || null);
+  }, [toolId]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", dark);
