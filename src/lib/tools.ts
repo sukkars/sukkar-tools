@@ -51,6 +51,7 @@ export const tools: ToolDef[] = [
   { id: "tts", title: "Text to Speech", description: "Read text aloud", icon: Volume2, category: "media" },
   { id: "stt", title: "Speech to Text", description: "Voice to text", icon: Mic, category: "media" },
   { id: "sound-viz", title: "Sound Visualizer", description: "Mic visualizer & recorder", icon: AudioWaveform, category: "media" },
+  { id: "m3u", title: "M3U Player", description: "Stream & playlist player", icon: Radio, category: "media" },
 
   // Productivity
   { id: "notes", title: "Fresh Notes", description: "Quick local notepad", icon: StickyNote, category: "productivity" },
