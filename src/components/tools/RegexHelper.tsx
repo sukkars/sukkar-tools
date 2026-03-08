@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Copy, Check, AlertCircle, Wand2 } from "lucide-react";
 import { toast } from "sonner";
-import HowToUse from "./HowToUse";
+
 
 const COMMON_PATTERNS = [
   { label: "Email", pattern: "[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}", desc: "Matches email addresses" },

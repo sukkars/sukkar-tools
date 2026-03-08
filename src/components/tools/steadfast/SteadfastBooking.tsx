@@ -4,7 +4,7 @@ import ApiKeySetup from "./ApiKeySetup";
 import SingleBooking from "./SingleBooking";
 import BulkBooking from "./BulkBooking";
 import AiBulkBooking from "./AiBulkBooking";
-import HowToUse from "../HowToUse";
+
 
 type Tab = "single" | "bulk" | "ai";
 

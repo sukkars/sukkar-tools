@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Plus, Trash2, Download, Copy, Edit2, Package, X } from "lucide-react";
 import { toast } from "sonner";
-import HowToUse from "./HowToUse";
+
 
 interface Variation {
   weight: string;
