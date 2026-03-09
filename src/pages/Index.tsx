@@ -278,6 +278,64 @@ const Index = () => {
   const ActiveComponent = activeTool ? toolComponents[activeTool] : null;
   const activeToolDef = activeTool ? tools.find(t => t.id === activeTool) : null;
 
+  // Update SEO meta tags dynamically
+  useEffect(() => {
+    if (activeToolDef) {
+      document.title = `${activeToolDef.title} - Sukkar Toolbox`;
+      
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.setAttribute('name', 'description');
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.setAttribute('content', `${activeToolDef.description} - Free online tool by Sukkar Toolbox`);
+
+      // Open Graph tags
+      let ogTitle = document.querySelector('meta[property="og:title"]');
+      if (!ogTitle) {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        document.head.appendChild(ogTitle);
+      }
+      ogTitle.setAttribute('content', `${activeToolDef.title} - Sukkar Toolbox`);
+
+      let ogDesc = document.querySelector('meta[property="og:description"]');
+      if (!ogDesc) {
+        ogDesc = document.createElement('meta');
+        ogDesc.setAttribute('property', 'og:description');
+        document.head.appendChild(ogDesc);
+      }
+      ogDesc.setAttribute('content', activeToolDef.description);
+    } else {
+      document.title = 'Sukkar Toolbox - Free Online Tools';
+      
+      let metaDesc = document.querySelector('meta[name="description"]');
+      if (!metaDesc) {
+        metaDesc = document.createElement('meta');
+        metaDesc.setAttribute('name', 'description');
+        document.head.appendChild(metaDesc);
+      }
+      metaDesc.setAttribute('content', `${tools.length} free online tools running entirely in your browser. No data leaves your device.`);
+
+      let ogTitle = document.querySelector('meta[property="og:title"]');
+      if (!ogTitle) {
+        ogTitle = document.createElement('meta');
+        ogTitle.setAttribute('property', 'og:title');
+        document.head.appendChild(ogTitle);
+      }
+      ogTitle.setAttribute('content', 'Sukkar Toolbox - Free Online Tools');
+
+      let ogDesc = document.querySelector('meta[property="og:description"]');
+      if (!ogDesc) {
+        ogDesc = document.createElement('meta');
+        ogDesc.setAttribute('property', 'og:description');
+        document.head.appendChild(ogDesc);
+      }
+      ogDesc.setAttribute('content', `${tools.length} free online tools for developers and creators`);
+    }
+  }, [activeToolDef]);
+
   const filteredTools = tools.filter(
     (t) =>
       t.title.toLowerCase().includes(search.toLowerCase()) ||
