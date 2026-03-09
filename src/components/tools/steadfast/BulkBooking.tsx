@@ -56,7 +56,11 @@ const BulkBooking = () => {
   };
 
   const copyId = (id: string) => {
-    navigator.clipboard.writeText(`Parcel ID: #${id}`);
+    const text = `Parcel ID: #${id}`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #f7f7f7;">${text}</span>`;
+    const blob = new Blob([html], { type: "text/html" });
+    const textBlob = new Blob([text], { type: "text/plain" });
+    navigator.clipboard.write([new ClipboardItem({ "text/html": blob, "text/plain": textBlob })]);
     toast.success("কপি হয়েছে!");
   };
 
