@@ -19,8 +19,8 @@ const SteadfastBooking = () => {
 
   return (
     <div className="space-y-4">
-      <h2 className="tool-title">Steadfast Booking</h2>
-      <p className="tool-description">Steadfast কুরিয়ারে সহজে অর্ডার বুকিং করুন — Single, Bulk ও AI মোডে</p>
+      <h2 className="tool-title">Steadfast Easy Booking Tool</h2>
+      <p className="tool-description">Steadfast কুরিয়ারে সহজে অর্ডার বুকিং করুন — Single, Bulk ও AI মোডে।</p>
 
 
       {/* API Key Setup */}
@@ -51,7 +51,7 @@ const SteadfastBooking = () => {
       {tab === "ai" && <AiBulkBooking />}
 
       <p className="text-xs text-muted-foreground text-center">
-        Disclaimer: এটি Steadfast-এর অফিসিয়াল প্রজেক্ট নয়। Powered by sukkarshop.com
+        <br/>
       </p>
     </div>
   );

@@ -175,6 +175,7 @@ const FeedbackSection = () => {
 
   return (
     <div className="tool-card !p-5 space-y-3">
+      <hr/>
       <h3 className="font-semibold flex items-center gap-2">
         <Mail className="w-4 h-4" /> Feedback / যোগাযোগ
       </h3>
@@ -539,8 +540,8 @@ const Index = () => {
                             style={{ background: "var(--gradient-primary)" }}>
                             <Mail className="w-5 h-5 text-primary-foreground" />
                           </div>
-                          <div className="font-semibold text-sm">Private SMS Server</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Send SMS via private server</div>
+                          <div className="font-semibold text-sm"> Bulk SMS Assistant</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Your Personal Bulk SMS Assistant</div>
                         </a>
                       )}
                     </div>
