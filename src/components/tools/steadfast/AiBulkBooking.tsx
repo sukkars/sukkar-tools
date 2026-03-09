@@ -125,8 +125,32 @@ const AiBulkBooking = () => {
   };
 
   const copyId = (id: string) => {
-    navigator.clipboard.writeText(`Parcel ID: #${id}`);
-    toast.success("কপি হয়েছে!");
+    const text = `Parcel ID: #${id}`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #e6fcf5; padding: 10px; border-radius: 6px; border: 1px solid #c3fae8;">${text}</span>`;
+    const blob = new Blob([html], { type: "text/html" });
+    const textBlob = new Blob([text], { type: "text/plain" });
+
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": blob,
+          "text/plain": textBlob,
+        }),
+      ]).then(() => {
+        toast.success("Copied!");
+      }).catch(() => {
+        navigator.clipboard.writeText(text);
+        toast.success("Copied (Plain Text)!");
+      });
+    } else {
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      toast.success("Copied!");
+    }
   };
 
   return (
@@ -217,9 +241,13 @@ const AiBulkBooking = () => {
                       {o.status === "pending" && <span className="text-amber-500">⏳ Pending</span>}
                       {o.status === "processing" && <span className="text-blue-500">🔄 Processing...</span>}
                       {o.status === "success" && (
-                        <div className="flex items-center gap-1">
-                          <span className="text-primary font-semibold">✅ #{o.parcelId}</span>
-                          <button onClick={() => copyId(o.parcelId!)} className="p-0.5 hover:bg-muted rounded"><Copy className="w-3 h-3" /></button>
+                        <div className="flex items-center gap-2">
+                          <div className="bg-[#e6fcf5] text-[#0ca678] font-bold px-2 py-1 rounded border border-[#c3fae8] flex items-center gap-1.5">
+                            <span>#{o.parcelId}</span>
+                            <button onClick={() => copyId(o.parcelId!)} className="hover:bg-[#c3fae8] p-0.5 rounded transition-colors text-[#0ca678]">
+                              <Copy className="w-3 h-3" />
+                            </button>
+                          </div>
                         </div>
                       )}
                       {o.status === "error" && <span className="text-destructive">❌ {o.errorMsg}</span>}
@@ -232,7 +260,15 @@ const AiBulkBooking = () => {
 
           <div className="tool-card !p-4 space-y-3">
             <label className="tool-label font-semibold">কমন নোট</label>
-            <input value={commonNote} onChange={(e) => setCommonNote(e.target.value)} placeholder="যেমন: সাবধানে ডেলিভারি করবেন" className="tool-input" />
+            <input 
+              id="commonNote"
+              name="common_note"
+              autoComplete="on"
+              value={commonNote} 
+              onChange={(e) => setCommonNote(e.target.value)} 
+              placeholder="যেমন: সাবধানে ডেলিভারি করবেন" 
+              className="tool-input" 
+            />
             <button onClick={submitAll} disabled={submitting || !hasSteadfastKeys} className="tool-btn w-full disabled:opacity-50">
               {submitting ? "বুকিং চলছে..." : <><Send className="w-4 h-4" /> সবগুলো একসাথে বুকিং দিন</>}
             </button>

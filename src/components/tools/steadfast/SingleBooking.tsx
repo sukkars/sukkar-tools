@@ -67,11 +67,32 @@ const SingleBooking = () => {
 
   const copyParcelId = (id: string) => {
     const text = `Parcel ID: #${id}`;
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #f7f7f7;">${text}</span>`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #f7f7f7; padding: 10px; border-radius: 6px; border: 1px solid #eee;">${text}</span>`;
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
-    navigator.clipboard.write([new ClipboardItem({ "text/html": blob, "text/plain": textBlob })]);
-    toast.success("কপি হয়েছে!");
+
+    if (navigator.clipboard && window.ClipboardItem) {
+      navigator.clipboard.write([
+        new ClipboardItem({
+          "text/html": blob,
+          "text/plain": textBlob,
+        }),
+      ]).then(() => {
+        toast.success("Copied!");
+      }).catch(() => {
+        // Fallback for some browsers
+        navigator.clipboard.writeText(text);
+        toast.success("Copied (Plain Text)!");
+      });
+    } else {
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      toast.success("Copied!");
+    }
   };
 
   return (
@@ -129,7 +150,14 @@ const SingleBooking = () => {
           </div>
           <div>
             <label className="tool-label">নোট (optional)</label>
-            <input value={form.note} onChange={(e) => setForm({ ...form, note: e.target.value })} className="tool-input" />
+            <input 
+              id="commonNote"
+              name="common_note"
+              autoComplete="on"
+              value={form.note} 
+              onChange={(e) => setForm({ ...form, note: e.target.value })} 
+              className="tool-input" 
+            />
           </div>
         </div>
 
@@ -148,10 +176,10 @@ const SingleBooking = () => {
           {result.status === "success" ? (
             <div className="space-y-3">
               <div className="text-sm font-medium text-primary flex items-center gap-2">✅ Consignment created successfully.</div>
-              <div className="bg-muted/30 rounded-lg p-3 flex items-center justify-between">
-                <span className="font-bold">Parcel Id : #{result.parcelId}</span>
-                <button onClick={() => copyParcelId(result.parcelId!)} className="tool-btn-outline !px-2 !py-1 text-xs">
-                  <Copy className="w-3 h-3" /> Copy
+              <div className="bg-[#f7f7f7] border border-[#eee] rounded-lg p-3 flex items-center justify-between">
+                <span className="font-bold text-lg font-poppins">Parcel Id : #{result.parcelId}</span>
+                <button onClick={() => copyParcelId(result.parcelId!)} className="tool-btn-outline !px-3 !py-1.5 text-xs font-semibold">
+                  <Copy className="w-3.5 h-3.5" /> Copy
                 </button>
               </div>
               {result.trackingCode && (

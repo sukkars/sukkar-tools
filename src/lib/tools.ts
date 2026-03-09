@@ -1,7 +1,9 @@
+import React from "react";
 import {
   Type, Hash, Lock, Braces, Binary, Palette, FileText, Ruler, Calendar, QrCode, Eye, Fingerprint,
   Code, MessageCircle, StickyNote, Table, AudioWaveform, Calculator, Heart, Volume2, Mic, Keyboard,
-  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio, FileCode2, Package, Link2
+  GitCompare, Timer, ShieldCheck, Barcode, ImageDown, Receipt, Regex, Radio, FileCode2, Package, Link2,
+  Mail
 } from "lucide-react";
 
 export interface ToolDef {
@@ -13,6 +15,7 @@ export interface ToolDef {
   howToUse: string[];
   howToUseEn: string[];
   requiresApi?: { name: string; key: string; optional?: boolean; description: string };
+  version?: string;
 }
 
 export const tools: ToolDef[] = [
@@ -49,10 +52,10 @@ export const tools: ToolDef[] = [
   { id: "uuid", title: "UUID Generator", description: "Random UUIDs", icon: Fingerprint, category: "dev",
     howToUse: ["Generate বাটনে ক্লিক করুন।", "নতুন UUID তৈরি হবে।", "Copy বাটনে ক্লিক করে কপি করুন। একাধিক UUID একসাথে তৈরি করতে পারবেন।"],
     howToUseEn: ["Click Generate to create a new UUID.", "Click Copy to copy it to clipboard.", "You can generate multiple UUIDs at once."] },
-  { id: "html-bbcode", title: "HTML → BBCode", description: "Convert HTML to BBCode", icon: Code, category: "dev",
+  { id: "html-bbcode", title: "HTML → BBCode", description: "Convert HTML to BBCode", icon: Code, category: "dev", version: "v2.1",
     howToUse: ["HTML কোড পেস্ট করুন।", "স্বয়ংক্রিয়ভাবে BBCode-এ কনভার্ট হবে।", "Copy বাটনে ক্লিক করে BBCode কপি করুন।"],
     howToUseEn: ["Paste your HTML code.", "BBCode output is generated automatically.", "Click Copy to copy the BBCode."] },
-  { id: "woo-csv", title: "WooCommerce CSV", description: "WooCommerce product import CSV", icon: Table, category: "generators",
+  { id: "woo-csv", title: "WooCommerce CSV", description: "WooCommerce product import CSV", icon: Table, category: "generators", version: "v2.1",
     howToUse: ["'Add Product' বাটনে ক্লিক করে নতুন প্রোডাক্ট যোগ করুন।", "Simple বা Variable প্রোডাক্ট টাইপ সিলেক্ট করুন।", "প্রোডাক্টের তথ্য (নাম, SKU, দাম, ক্যাটেগরি) পূরণ করুন।", "Variable প্রোডাক্টে ভিন্ন ওজন ও দামের variation যোগ করুন।", "'Generate CSV' বাটনে ক্লিক করে ফাইল ডাউনলোড করুন।", "WordPress → WooCommerce → Products → Import-এ CSV ফাইল আপলোড করুন।"],
     howToUseEn: ["Click 'Add Product' to add a new product entry.", "Choose Simple or Variable product type.", "Fill in product details (name, SKU, price, category).", "For Variable products, add weight/price variations.", "Click 'Generate CSV' to download the file.", "Upload the CSV in WordPress → WooCommerce → Products → Import."] },
   { id: "hash", title: "Hash Generator", description: "SHA-1, SHA-256, SHA-512", icon: ShieldCheck, category: "dev",
@@ -108,7 +111,7 @@ export const tools: ToolDef[] = [
   { id: "stt", title: "Speech to Text", description: "Voice to text", icon: Mic, category: "media",
     howToUse: ["Start বাটনে ক্লিক করুন ও মাইক্রোফোনের অনুমতি দিন।", "কথা বলুন — লাইভ টেক্সট দেখুন।", "Stop বাটনে ক্লিক করে কপি করুন।"],
     howToUseEn: ["Click Start and allow microphone access.", "Speak — live text appears on screen.", "Click Stop, then Copy to copy the transcribed text."] },
-  { id: "sound-viz", title: "Sound Visualizer", description: "Mic visualizer & recorder", icon: AudioWaveform, category: "media",
+  { id: "sound-viz", title: "Sound Visualizer", description: "Mic visualizer & recorder", icon: AudioWaveform, category: "media", version: "v2.1",
     howToUse: ["'Start Mic' বাটনে ক্লিক করে মাইক্রোফোন চালু করুন।", "Visualization style (Bars, Wave, Circles) ও color theme বেছে নিন।", "Record বাটনে ক্লিক করে ভিডিও রেকর্ড করুন।", "Audio Record বাটনে শুধু অডিও রেকর্ড করুন।"],
     howToUseEn: ["Click 'Start Mic' to enable your microphone.", "Choose a visualization style (Bars, Wave, Circles) and color theme.", "Click Record to capture video, or Audio Record for audio only."] },
   { id: "m3u", title: "M3U Player", description: "Stream & playlist player", icon: Radio, category: "media",
@@ -122,10 +125,16 @@ export const tools: ToolDef[] = [
   { id: "stopwatch", title: "Stopwatch & Timer", description: "Track time", icon: Timer, category: "productivity",
     howToUse: ["Stopwatch মোডে Start/Stop/Reset করুন।", "Lap বাটনে ক্লিক করে ল্যাপ টাইম রেকর্ড করুন।", "Timer মোডে সময় সেট করে Start করুন।", "PiP Mode বাটনে ক্লিক করলে ছোট floating window-তে টাইমার দেখাবে।"],
     howToUseEn: ["In Stopwatch mode, use Start / Stop / Reset.", "Click Lap to record lap times.", "In Timer mode, set a duration and press Start.", "Use PiP for a floating overlay, or Popup for a separate window."] },
-  { id: "steadfast", title: "Steadfast Booking", description: "Courier booking tool", icon: Package, category: "productivity",
+  { id: "steadfast", title: "Steadfast Booking", description: "Courier booking tool", icon: Package, category: "productivity", version: "v1.98",
     requiresApi: { name: "Steadfast API", key: "steadfast_api_key", description: "Steadfast courier API key" },
     howToUse: ["প্রথমে Steadfast API Key ও Secret Key সেট করুন।", "Single মোডে: কাস্টমারের মেসেজ পেস্ট করুন → প্রসেস → বুকিং কনফার্ম।", "Bulk মোডে: একাধিক অর্ডার --- দিয়ে আলাদা করে দিন → একসাথে বুকিং।", "AI Bulk মোডে: মেসেঞ্জারের অগোছালো মেসেজ পেস্ট করুন → AI তথ্য বের করবে।", "AI মোডের জন্য Google Gemini API Key প্রয়োজন হবে (ফ্রি)।"],
-    howToUseEn: ["এই সিরিয়ালে আপনার মেসেজ পেস্ট করতে হবে-, "১ম লাইন: কাস্টমারের নাম।", "২য় লাইন: বিস্তারিত ঠিকানা (থানা ও জেলাসহ)।", "৩য় লাইন: ফোন নম্বর।", "৪র্থ লাইন: COD টাকার পরিমাণ (যেমন: 500)","Disclaimer: এটি Steadfastএর অফিসিয়াল প্রজেক্ট নয়। This is not an official Steadfast project. "] },
+    howToUseEn: ["১ম লাইন: কাস্টমারের নাম।", "২য় লাইন: বিস্তারিত ঠিকানা (থানা ও জেলাসহ)।", "৩য় লাইন: ফোন নম্বর।", "৪র্থ লাইন: COD টাকার পরিমাণ (যেমন: 500)", "Disclaimer: এটি Steadfastএর অফিসিয়াল প্রজেক্ট নয়। This is not an official Steadfast project."] },
+  { id: "bulk-sms", title: "Bulk SMS Assistant", description: "Your Personal Bulk SMS Assistant", icon: Mail, category: "dev",
+    howToUse: ["Click the button below to open Bulk SMS Assistant.", "This will redirect you to an external site."],
+    howToUseEn: ["Click the button below to open Bulk SMS Assistant.", "This will redirect you to an external site."] },
+  { id: "live-tv", title: "Live Islamic TV", description: "Watch Live Islamic TV channels", icon: Radio, category: "media",
+    howToUse: ["Click the button below to open Live Islamic TV.", "This will redirect you to an external site."],
+    howToUseEn: ["Click the button below to open Live Islamic TV.", "This will redirect you to an external site."] },
   { id: "url-shortener", title: "URL Shortener", description: "Shorten URLs with is.gd & v.gd", icon: Link2, category: "generators",
     howToUse: ["URL পেস্ট করুন (http:// বা https:// সহ)।", "is.gd বা v.gd সার্ভিস সিলেক্ট করুন, অথবা 'সবগুলো দিয়ে শর্ট করুন' চেক করুন।", "শর্ট করুন বাটনে ক্লিক করুন।", "রেজাল্ট থেকে কপি বাটনে ক্লিক করে শর্ট URL কপি করুন।"],
     howToUseEn: ["Paste a URL (including http:// or https://).", "Select is.gd or v.gd, or check 'Shorten with all' to use both.", "Click the Shorten button.", "Copy the shortened URL from the results."] },

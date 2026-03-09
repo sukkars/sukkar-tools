@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { tools, categories } from "@/lib/tools";
 import { Menu, X, Wrench, Search, Home, HelpCircle, ChevronDown, ChevronUp, Settings2, Key, AlertTriangle, Sun, Moon, Clock, Trash2, Mail } from "lucide-react";
@@ -35,6 +35,7 @@ import M3uPlayer from "@/components/tools/M3uPlayer";
 import DataEncoder from "@/components/tools/DataEncoder";
 import SteadfastBooking from "@/components/tools/steadfast/SteadfastBooking";
 import UrlShortener from "@/components/tools/UrlShortener";
+import RedirectTool from "@/components/tools/RedirectTool";
 
 const toolComponents: Record<string, React.FC> = {
   "text-case": TextCaseConverter,
@@ -70,6 +71,8 @@ const toolComponents: Record<string, React.FC> = {
   m3u: M3uPlayer,
   steadfast: SteadfastBooking,
   "url-shortener": UrlShortener,
+  "bulk-sms": () => <RedirectTool url="https://sms.sukkarshop.com/" title="Bulk SMS Assistant" />,
+  "live-tv": () => <RedirectTool url="https://peacetv.vercel.app/" title="Live Islamic TV" />,
 };
 
 /* ─── How To Use (inline collapsible) ─── */
@@ -200,7 +203,7 @@ const FeedbackSection = () => {
   );
 };
 
-const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
+const ToolFooter = ({ toolTitle, version }: { toolTitle?: string; version?: string }) => {
   return (
     <footer className="mt-8 pt-4 border-t border-border text-center space-y-2">
       <div className="flex items-center justify-center gap-2 flex-wrap text-sm">
@@ -209,7 +212,7 @@ const ToolFooter = ({ toolTitle }: { toolTitle?: string }) => {
         <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary transition-colors">🏠 Homepage</a>
       </div>
       <p className="text-xs text-muted-foreground">
-        <strong>{toolTitle || "Sukkar Toolbox"}</strong> v1.0 | Powered by{" "}
+        <strong>{toolTitle || "Sukkar Toolbox"}</strong> {version ? version : "v1.0"} | Powered by{" "}
         <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary">sukkarshop.com</a>
       </p>
       <p className="text-[11px] text-muted-foreground/70">
@@ -456,7 +459,7 @@ const Index = () => {
               {/* How To Use below every tool */}
               {activeToolDef && <HowToUseSection stepsBn={activeToolDef.howToUse} stepsEn={activeToolDef.howToUseEn} />}
               {/* Footer */}
-              <ToolFooter toolTitle={activeToolDef?.title} />
+              <ToolFooter toolTitle={activeToolDef?.title} version={activeToolDef?.version} />
             </div>
           ) : (
             /* Home grid */
@@ -529,21 +532,6 @@ const Index = () => {
                           </button>
                         );
                       })}
-                      {cat.id === "dev" && (
-                        <a
-                          href="https://sms.sukkarshop.com/"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="tool-card !p-4 text-left hover:border-primary/30 hover:-translate-y-0.5 transition-all group cursor-pointer"
-                        >
-                          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"
-                            style={{ background: "var(--gradient-primary)" }}>
-                            <Mail className="w-5 h-5 text-primary-foreground" />
-                          </div>
-                          <div className="font-semibold text-sm"> Bulk SMS Assistant</div>
-                          <div className="text-xs text-muted-foreground mt-0.5">Your Personal Bulk SMS Assistant</div>
-                        </a>
-                      )}
                     </div>
                   </div>
                 );
