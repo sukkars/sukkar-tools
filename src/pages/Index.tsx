@@ -83,7 +83,7 @@ const HowToUseSection = ({ stepsBn, stepsEn }: { stepsBn: string[]; stepsEn: str
       >
         <span className="flex items-center gap-2">
           <HelpCircle className="w-4 h-4 text-primary" />
-          কিভাবে ব্যবহার করবেন? (⁉️ How to use?)
+          কিভাবে ব্যবহার করবেন? (How to use?)
         </span>
         {open ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
       </button>
