@@ -348,7 +348,7 @@ const Index = () => {
   };
 
   const selectTool = (id: string) => {
-    navigate(`/tool/${id}`);
+    navigate(`/${id}`);
     setSidebarOpen(false);
     trackRecent(id);
   };
