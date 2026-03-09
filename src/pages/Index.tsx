@@ -528,6 +528,21 @@ const Index = () => {
                           </button>
                         );
                       })}
+                      {cat.id === "dev" && (
+                        <a
+                          href="https://sms.sukkarshop.com/"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="tool-card !p-4 text-left hover:border-primary/30 hover:-translate-y-0.5 transition-all group cursor-pointer"
+                        >
+                          <div className="w-10 h-10 rounded-xl flex items-center justify-center mb-3 group-hover:scale-110 transition-transform"
+                            style={{ background: "var(--gradient-primary)" }}>
+                            <Mail className="w-5 h-5 text-primary-foreground" />
+                          </div>
+                          <div className="font-semibold text-sm">Private SMS Server</div>
+                          <div className="text-xs text-muted-foreground mt-0.5">Send SMS via private server</div>
+                        </a>
+                      )}
                     </div>
                   </div>
                 );
