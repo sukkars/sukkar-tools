@@ -69,8 +69,8 @@ const SingleBooking = () => {
     if (!id) return;
     const text = `Parcel Id : #${id}`;
     // Using 16pt as requested/seen in original tool for large rich text copy
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #f7f7f7; padding: 4px; border: 1px solid #eee; border-radius: 4px;">${text}</span>`;
-    
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #c2c2c2ff; padding: 4px;">${text}</span>`;
+
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 
@@ -178,8 +178,8 @@ const SingleBooking = () => {
           {result.status === "success" ? (
             <div className="space-y-2">
               <div className="text-[12px] font-medium text-primary flex items-center gap-1.5">✅ Consignment created successfully.</div>
-              
-              <div 
+
+              <div
                 onClick={() => copyParcelId(result.parcelId)}
                 className="bg-[#f7f7f7] border border-[#eee] rounded-md p-2 flex items-center justify-between cursor-pointer hover:bg-[#f0f0f0] transition-colors group"
                 title="Click to copy Parcel ID"
