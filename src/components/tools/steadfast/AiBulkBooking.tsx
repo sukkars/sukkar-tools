@@ -124,9 +124,10 @@ const AiBulkBooking = () => {
     toast.success("সবগুলো প্রসেস শেষ।");
   };
 
-  const copyId = (id: string) => {
-    const text = `Parcel ID: #${id}`;
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #e6fcf5; padding: 10px; border-radius: 3px; border: 1px solid #c3fae8;">${text}</span>`;
+  const copyId = (id: string | undefined) => {
+    if (!id) return;
+    const text = `Parcel Id : #${id}`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #f7f7f7; padding: 4px; border: 1px solid #eee; border-radius: 4px;">${text}</span>`;
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 
@@ -137,10 +138,10 @@ const AiBulkBooking = () => {
           "text/plain": textBlob,
         }),
       ]).then(() => {
-        toast.success("Copied!");
+        toast.success("ID Copied!");
       }).catch(() => {
         navigator.clipboard.writeText(text);
-        toast.success("Copied (Plain Text)!");
+        toast.success("ID Copied!");
       });
     } else {
       const el = document.createElement('textarea');
@@ -149,18 +150,18 @@ const AiBulkBooking = () => {
       el.select();
       document.execCommand('copy');
       document.body.removeChild(el);
-      toast.success("Copied!");
+      toast.success("ID Copied!");
     }
   };
 
   return (
     <div className="space-y-4">
       {/* AI Status */}
-      <div className="flex items-center gap-3 text-xs text-muted-foreground">
+      <div className="flex items-center gap-3 text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">
         <span>Steadfast: {hasSteadfastKeys ? "🟢" : "🔴"}</span>
         <span>Gemini AI: {hasAiKey ? "🟢" : "🔴"}</span>
-        <button onClick={() => setShowSettings(!showSettings)} className="tool-btn-outline !px-2 !py-1 text-xs ml-auto">
-          <Settings className="w-3 h-3" /> AI Settings
+        <button onClick={() => setShowSettings(!showSettings)} className="text-primary hover:underline ml-auto flex items-center gap-1">
+          <Settings className="w-2.5 h-2.5" /> AI Settings
         </button>
       </div>
 
@@ -169,39 +170,39 @@ const AiBulkBooking = () => {
         <div className="tool-card !p-4 space-y-3 border-primary/30">
           <h3 className="text-sm font-semibold">⚙️ AI Settings</h3>
           <div>
-            <label className="tool-label">
+            <label className="tool-label text-xs">
               Gemini AI Key{" "}
               <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener" className="text-primary underline">(সংগ্রহ করুন)</a>
             </label>
-            <input type="password" value={aiKey} onChange={(e) => setAiKey(e.target.value)} placeholder="Gemini API Key" className="tool-input" />
+            <input type="password" value={aiKey} onChange={(e) => setAiKey(e.target.value)} placeholder="Gemini API Key" className="tool-input text-xs" />
           </div>
           <div>
-            <label className="tool-label">AI Model</label>
-            <select value={model} onChange={(e) => setModel(e.target.value)} className="tool-input">
+            <label className="tool-label text-xs">AI Model</label>
+            <select value={model} onChange={(e) => setModel(e.target.value)} className="tool-input text-xs">
               {AI_MODELS.map(m => <option key={m.value} value={m.value}>{m.label}</option>)}
             </select>
           </div>
-          <button onClick={saveAiSettings} className="tool-btn text-xs">Save</button>
+          <button onClick={saveAiSettings} className="tool-btn text-xs !py-1.5">Save</button>
         </div>
       )}
 
       {/* AI Input */}
-      <div className="tool-card !p-4 space-y-3 border-2 border-dashed border-primary/30 bg-primary/5">
-        <div className="flex items-center gap-2 text-sm font-semibold text-primary">
-          <Sparkles className="w-4 h-4" /> AI Smart Reader
+      <div className="tool-card !p-3 space-y-2 border-2 border-dashed border-primary/30 bg-primary/5">
+        <div className="flex items-center gap-2 text-xs font-bold text-primary">
+          <Sparkles className="w-3.5 h-3.5" /> AI Smart Reader
         </div>
         <textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
           placeholder="মেসেঞ্জারের কাস্টমার মেসেজ এখানে পেস্ট করুন..."
-          className="tool-textarea !min-h-[100px]"
+          className="tool-textarea !min-h-[80px] text-xs"
         />
         <div className="flex gap-2 flex-wrap">
-          <button onClick={aiExtract} disabled={aiLoading} className="tool-btn text-xs disabled:opacity-50">
+          <button onClick={aiExtract} disabled={aiLoading} className="tool-btn text-[11px] !py-1.5 disabled:opacity-50">
             {aiLoading ? "প্রসেসিং..." : <><Sparkles className="w-3 h-3" /> AI দিয়ে তথ্য বের করুন</>}
           </button>
-          <button onClick={manualExtract} className="tool-btn-outline text-xs">ম্যানুয়াল এন্ট্রি</button>
-          <button onClick={() => { setInput(""); setOrders([]); }} className="tool-btn-outline text-xs">
+          <button onClick={manualExtract} className="tool-btn-outline text-[11px] !py-1.5">ম্যানুয়াল এন্ট্রি</button>
+          <button onClick={() => { setInput(""); setOrders([]); }} className="tool-btn-outline text-[11px] !py-1.5">
             <RotateCcw className="w-3 h-3" /> সব ক্লিয়ার
           </button>
         </div>
@@ -226,28 +227,28 @@ const AiBulkBooking = () => {
               </thead>
               <tbody className="divide-y divide-border">
                 {orders.map((o, i) => (
-                  <tr key={i} className="text-xs">
-                    <td className="px-3 py-2 text-muted-foreground font-bold">{i + 1}</td>
-                    <td className="px-3 py-2">{o.name}</td>
-                    <td className="px-3 py-2 max-w-[150px] truncate">{o.address}</td>
-                    <td className="px-3 py-2 font-mono">{o.phone}</td>
-                    <td className="px-3 py-2">{o.cod}</td>
-                    <td className="px-3 py-2">
+                  <tr key={i} className="text-[11px]">
+                    <td className="px-3 py-1.5 text-muted-foreground font-bold">{i + 1}</td>
+                    <td className="px-3 py-1.5">{o.name}</td>
+                    <td className="px-3 py-1.5 max-w-[120px] truncate">{o.address}</td>
+                    <td className="px-3 py-1.5 font-mono">{o.phone}</td>
+                    <td className="px-3 py-1.5">{o.cod}</td>
+                    <td className="px-3 py-1.5">
                       <button onClick={() => deleteOrder(i)} className="text-destructive hover:text-destructive/80">
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </td>
-                    <td className="px-3 py-2">
-                      {o.status === "pending" && <span className="text-amber-500">⏳ Pending</span>}
-                      {o.status === "processing" && <span className="text-blue-500">🔄 Processing...</span>}
+                    <td className="px-3 py-1.5">
+                      {o.status === "pending" && <span className="text-amber-500 font-medium">⏳ Pending</span>}
+                      {o.status === "processing" && <span className="text-blue-500 font-medium">🔄 Proc...</span>}
                       {o.status === "success" && (
-                        <div className="flex items-center gap-2">
-                          <div className="bg-[#e6fcf5] text-[#0ca678] font-bold px-2 py-1 rounded border border-[#c3fae8] flex items-center gap-1.5">
-                            <span>#{o.parcelId}</span>
-                            <button onClick={() => copyId(o.parcelId!)} className="hover:bg-[#c3fae8] p-0.5 rounded transition-colors text-[#0ca678]">
-                              <Copy className="w-3 h-3" />
-                            </button>
-                          </div>
+                        <div 
+                          onClick={() => copyId(o.parcelId)}
+                          className="inline-flex items-center gap-1 bg-[#f7f7f7] border border-[#eee] rounded px-1.5 py-0.5 cursor-pointer hover:bg-[#f0f0f0] transition-colors group"
+                          title="Click to copy"
+                        >
+                          <span className="font-bold text-[#444]">#{o.parcelId}</span>
+                          <Copy className="w-2.5 h-2.5 text-muted-foreground group-hover:text-primary transition-colors" />
                         </div>
                       )}
                       {o.status === "error" && <span className="text-destructive">❌ {o.errorMsg}</span>}

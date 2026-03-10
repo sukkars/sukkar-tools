@@ -9,16 +9,24 @@ interface ShortenedUrl {
 }
 
 const SERVICES = [
-  { id: "isgd", label: "is.gd", shorten: async (url: string) => {
-    const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}`);
+  { id: "isgd", label: "is.gd", shorten: async (url: string, slug?: string) => {
+    const slugParam = slug ? `&shorturl=${encodeURIComponent(slug)}` : "";
+    const res = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(url)}${slugParam}`);
     const data = await res.json();
-    if (data.errorcode) throw new Error(data.errormessage);
+    if (data.errorcode) {
+      if (data.errorcode === 2) throw new Error("এই শর্ট স্লাগটি আগেই নেওয়া হয়েছে, অন্য কিছু ট্রাই করুন");
+      throw new Error(data.errormessage);
+    }
     return data.shorturl;
   }},
-  { id: "vgd", label: "v.gd", shorten: async (url: string) => {
-    const res = await fetch(`https://v.gd/create.php?format=json&url=${encodeURIComponent(url)}`);
+  { id: "vgd", label: "v.gd", shorten: async (url: string, slug?: string) => {
+    const slugParam = slug ? `&shorturl=${encodeURIComponent(slug)}` : "";
+    const res = await fetch(`https://v.gd/create.php?format=json&url=${encodeURIComponent(url)}${slugParam}`);
     const data = await res.json();
-    if (data.errorcode) throw new Error(data.errormessage);
+    if (data.errorcode) {
+      if (data.errorcode === 2) throw new Error("এই শর্ট স্লাগটি আগেই নেওয়া হয়েছে, অন্য কিছু ট্রাই করুন");
+      throw new Error(data.errormessage);
+    }
     return data.shorturl;
   }},
 ];
@@ -26,9 +34,9 @@ const SERVICES = [
 const UrlShortener = () => {
   const [url, setUrl] = useState("");
   const [service, setService] = useState("isgd");
+  const [customSlug, setCustomSlug] = useState("");
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<ShortenedUrl[]>([]);
-  const [shortenAll, setShortenAll] = useState(false);
 
   const shorten = async () => {
     const trimmed = url.trim();
@@ -37,24 +45,11 @@ const UrlShortener = () => {
 
     setLoading(true);
     try {
-      if (shortenAll) {
-        const promises = SERVICES.map(async (s) => {
-          try {
-            const short = await s.shorten(trimmed);
-            return { original: trimmed, short, service: s.label };
-          } catch {
-            return { original: trimmed, short: "Error", service: s.label };
-          }
-        });
-        const all = await Promise.all(promises);
-        setResults(prev => [...all, ...prev]);
-        toast.success(`${SERVICES.length} সার্ভিসে শর্ট হয়েছে!`);
-      } else {
-        const svc = SERVICES.find(s => s.id === service)!;
-        const short = await svc.shorten(trimmed);
-        setResults(prev => [{ original: trimmed, short, service: svc.label }, ...prev]);
-        toast.success("URL শর্ট হয়েছে!");
-      }
+      const svc = SERVICES.find(s => s.id === service)!;
+      const short = await svc.shorten(trimmed, customSlug.trim() || undefined);
+      setResults(prev => [{ original: trimmed, short, service: svc.label }, ...prev]);
+      toast.success("URL শর্ট হয়েছে!");
+      setCustomSlug(""); // Clear slug after success
     } catch (e: any) {
       toast.error(e.message || "শর্ট করা যায়নি");
     } finally {
@@ -84,29 +79,34 @@ const UrlShortener = () => {
           />
         </div>
 
+        <div>
+          <label className="tool-label">Custom Slug (Optional)</label>
+          <input
+            value={customSlug}
+            onChange={(e) => setCustomSlug(e.target.value)}
+            placeholder="my-link-name"
+            className="tool-input"
+            onKeyDown={(e) => e.key === "Enter" && shorten()}
+          />
+        </div>
+
         <div className="flex items-center gap-3 flex-wrap">
           <div className="flex items-center gap-2">
             <label className="tool-label !mb-0 text-xs">Service:</label>
-            {!shortenAll && (
-              <div className="flex gap-1">
-                {SERVICES.map(s => (
-                  <button
-                    key={s.id}
-                    onClick={() => setService(s.id)}
-                    className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
-                      service === s.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
-              </div>
-            )}
+            <div className="flex gap-1">
+              {SERVICES.map(s => (
+                <button
+                  key={s.id}
+                  onClick={() => setService(s.id)}
+                  className={`px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
+                    service === s.id ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {s.label}
+                </button>
+              ))}
+            </div>
           </div>
-          <label className="flex items-center gap-1.5 text-xs text-muted-foreground cursor-pointer">
-            <input type="checkbox" checked={shortenAll} onChange={(e) => setShortenAll(e.target.checked)} className="rounded" />
-            সবগুলো দিয়ে শর্ট করুন
-          </label>
         </div>
 
         <button onClick={shorten} disabled={loading} className="tool-btn w-full disabled:opacity-50">

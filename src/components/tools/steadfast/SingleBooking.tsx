@@ -65,9 +65,12 @@ const SingleBooking = () => {
     }
   };
 
-  const copyParcelId = (id: string) => {
-    const text = `Parcel ID: #${id}`;
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #f7f7f7;">${text}</span>`;
+  const copyParcelId = (id: string | undefined) => {
+    if (!id) return;
+    const text = `Parcel Id : #${id}`;
+    // Using 16pt as requested/seen in original tool for large rich text copy
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #f7f7f7; padding: 4px; border: 1px solid #eee; border-radius: 4px;">${text}</span>`;
+    
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 
@@ -78,11 +81,10 @@ const SingleBooking = () => {
           "text/plain": textBlob,
         }),
       ]).then(() => {
-        toast.success("Copied!");
+        toast.success("ID Copied with formatting!");
       }).catch(() => {
-        // Fallback for some browsers
         navigator.clipboard.writeText(text);
-        toast.success("Copied (Plain Text)!");
+        toast.success("ID Copied!");
       });
     } else {
       const el = document.createElement('textarea');
@@ -91,7 +93,7 @@ const SingleBooking = () => {
       el.select();
       document.execCommand('copy');
       document.body.removeChild(el);
-      toast.success("Copied!");
+      toast.success("ID Copied!");
     }
   };
 
@@ -172,22 +174,28 @@ const SingleBooking = () => {
 
       {/* Response */}
       {result && (
-        <div className="tool-card !p-4">
+        <div className="tool-card !p-3">
           {result.status === "success" ? (
-            <div className="space-y-3">
-              <div className="text-sm font-medium text-primary flex items-center gap-2">✅ Consignment created successfully.</div>
-              <div className="bg-[#f7f7f7] border border-[#eee] rounded-lg p-3 flex items-center justify-between">
-                <span className="font-bold text-lg font-poppins">Parcel Id : #{result.parcelId}</span>
-                <button onClick={() => copyParcelId(result.parcelId!)} className="tool-btn-outline !px-3 !py-1.5 text-xs font-semibold">
-                  <Copy className="w-3.5 h-3.5" /> Copy
-                </button>
+            <div className="space-y-2">
+              <div className="text-[12px] font-medium text-primary flex items-center gap-1.5">✅ Consignment created successfully.</div>
+              
+              <div 
+                onClick={() => copyParcelId(result.parcelId)}
+                className="bg-[#f7f7f7] border border-[#eee] rounded-md p-2 flex items-center justify-between cursor-pointer hover:bg-[#f0f0f0] transition-colors group"
+                title="Click to copy Parcel ID"
+              >
+                <span className="font-bold text-sm font-poppins">Parcel Id : #{result.parcelId}</span>
+                <span className="text-[10px] bg-white border border-[#ddd] px-1.5 py-0.5 rounded text-muted-foreground group-hover:text-primary group-hover:border-primary transition-colors">
+                  <Copy className="w-2.5 h-2.5 inline mr-1" />Copy
+                </span>
               </div>
+
               {result.trackingCode && (
-                <div className="bg-muted/30 rounded-lg p-3 flex items-center justify-between">
-                  <span className="font-bold">Tracking: {result.trackingCode}</span>
+                <div className="bg-muted/20 border border-muted/10 rounded-md p-2 flex items-center justify-between">
+                  <span className="font-bold text-xs">Tracking: {result.trackingCode}</span>
                   <a href={`https://steadfast.com.bd/t/${result.trackingCode}`} target="_blank" rel="noopener"
-                    className="tool-btn-outline !px-2 !py-1 text-xs">
-                    <ExternalLink className="w-3 h-3" /> View
+                    className="text-[10px] bg-background border border-border px-1.5 py-0.5 rounded hover:bg-muted transition-colors flex items-center gap-1">
+                    <ExternalLink className="w-2.5 h-2.5" /> View
                   </a>
                 </div>
               )}

@@ -55,9 +55,10 @@ const BulkBooking = () => {
     toast.success("সবগুলো প্রসেস শেষ হয়েছে।");
   };
 
-  const copyId = (id: string) => {
-    const text = `Parcel ID: #${id}`;
-    const html = `<div style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background: #e6fcf5; padding: 10px; border: 1px solid #c3fae8; border-radius: 6px;">${text}</div>`;
+  const copyId = (id: string | undefined) => {
+    if (!id) return;
+    const text = `Parcel Id : #${id}`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #f7f7f7; padding: 4px; border: 1px solid #eee; border-radius: 4px;">${text}</span>`;
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 
@@ -68,10 +69,10 @@ const BulkBooking = () => {
           "text/plain": textBlob,
         }),
       ]).then(() => {
-        toast.success("Copied!");
+        toast.success("ID Copied!");
       }).catch(() => {
         navigator.clipboard.writeText(text);
-        toast.success("Copied (Plain Text)!");
+        toast.success("ID Copied!");
       });
     } else {
       const el = document.createElement('textarea');
@@ -80,7 +81,7 @@ const BulkBooking = () => {
       el.select();
       document.execCommand('copy');
       document.body.removeChild(el);
-      toast.success("Copied!");
+      toast.success("ID Copied!");
     }
   };
 
@@ -112,7 +113,7 @@ const BulkBooking = () => {
                   <th className="px-3 py-2 text-left font-medium">#</th>
                   <th className="px-3 py-2 text-left font-medium">নাম</th>
                   <th className="px-3 py-2 text-left font-medium">ঠিকানা</th>
-                  <th className="px-3 py-2 text-left font-medium">ফোন</th>
+                  <th className="px-3 py-2 text-left font-medium">phone</th>
                   <th className="px-3 py-2 text-left font-medium">COD</th>
                   <th className="px-3 py-2 text-left font-medium w-10"></th>
                   <th className="px-3 py-2 text-left font-medium">স্ট্যাটাস</th>
@@ -120,28 +121,28 @@ const BulkBooking = () => {
               </thead>
               <tbody className="divide-y divide-border">
                 {orders.map((o, i) => (
-                  <tr key={i} className="text-xs">
-                    <td className="px-3 py-2 text-muted-foreground font-bold">{i + 1}</td>
-                    <td className="px-3 py-2">{o.name}</td>
-                    <td className="px-3 py-2 max-w-[150px] truncate">{o.address}</td>
-                    <td className="px-3 py-2 font-mono">{o.phone}</td>
-                    <td className="px-3 py-2">{o.cod}</td>
-                    <td className="px-3 py-2">
+                  <tr key={i} className="text-[11px]">
+                    <td className="px-3 py-1.5 text-muted-foreground font-bold">{i + 1}</td>
+                    <td className="px-3 py-1.5">{o.name}</td>
+                    <td className="px-3 py-1.5 max-w-[120px] truncate">{o.address}</td>
+                    <td className="px-3 py-1.5 font-mono">{o.phone}</td>
+                    <td className="px-3 py-1.5">{o.cod}</td>
+                    <td className="px-3 py-1.5">
                       <button onClick={() => deleteOrder(i)} className="text-destructive hover:text-destructive/80">
-                        <Trash2 className="w-3.5 h-3.5" />
+                        <Trash2 className="w-3 h-3" />
                       </button>
                     </td>
-                    <td className="px-3 py-2">
+                    <td className="px-3 py-1.5">
                       {o.status === "pending" && <span className="text-amber-500">⏳ Pending</span>}
                       {o.status === "processing" && <span className="text-blue-500">🔄 Processing...</span>}
                       {o.status === "success" && (
-                        <div className="flex items-center gap-2">
-                          <div className="bg-[#e6fcf5] text-[#0ca678] font-bold px-2 py-1 rounded border border-[#c3fae8] flex items-center gap-1.5">
-                            <span>#{o.parcelId}</span>
-                            <button onClick={() => copyId(o.parcelId!)} className="hover:bg-[#c3fae8] p-0.5 rounded transition-colors text-[#0ca678]">
-                              <Copy className="w-3 h-3" />
-                            </button>
-                          </div>
+                        <div 
+                          onClick={() => copyId(o.parcelId)}
+                          className="inline-flex items-center gap-1 bg-[#f7f7f7] border border-[#eee] rounded px-1.5 py-0.5 cursor-pointer hover:bg-[#f0f0f0] transition-colors group"
+                          title="Click to copy"
+                        >
+                          <span className="font-bold text-[#444]">#{o.parcelId}</span>
+                          <Copy className="w-2.5 h-2.5 text-muted-foreground group-hover:text-primary transition-colors" />
                         </div>
                       )}
                       {o.status === "error" && <span className="text-destructive">❌ {o.errorMsg}</span>}

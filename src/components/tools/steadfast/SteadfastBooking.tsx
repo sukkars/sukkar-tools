@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Package, Layers, Sparkles, HelpCircle, ChevronDown } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Package, Layers, Sparkles } from "lucide-react";
 import ApiKeySetup from "./ApiKeySetup";
 import SingleBooking from "./SingleBooking";
 import BulkBooking from "./BulkBooking";
@@ -17,6 +17,25 @@ const TABS: { id: Tab; label: string; icon: React.ElementType }[] = [
 const SteadfastBooking = () => {
   const [tab, setTab] = useState<Tab>("single");
 
+  // Sync tab with URL hash
+  useEffect(() => {
+    const handleHashChange = () => {
+      const hash = window.location.hash.replace("#", "") as Tab;
+      if (TABS.find(t => t.id === hash)) {
+        setTab(hash);
+      }
+    };
+
+    handleHashChange(); // Initial check
+    window.addEventListener("hashchange", handleHashChange);
+    return () => window.removeEventListener("hashchange", handleHashChange);
+  }, []);
+
+  const handleTabChange = (newTab: Tab) => {
+    setTab(newTab);
+    window.location.hash = newTab;
+  };
+
   return (
     <div className="space-y-4">
       <h2 className="tool-title">Steadfast Easy Booking Tool</h2>
@@ -33,7 +52,7 @@ const SteadfastBooking = () => {
           return (
             <button
               key={t.id}
-              onClick={() => setTab(t.id)}
+              onClick={() => handleTabChange(t.id)}
               className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
                 tab === t.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
               }`}
@@ -49,10 +68,6 @@ const SteadfastBooking = () => {
       {tab === "single" && <SingleBooking />}
       {tab === "bulk" && <BulkBooking />}
       {tab === "ai" && <AiBulkBooking />}
-
-      <p className="text-xs text-muted-foreground text-center">
-        <br/>
-      </p>
     </div>
   );
 };
