@@ -67,7 +67,7 @@ const SingleBooking = () => {
 
   const copyParcelId = (id: string) => {
     const text = `Parcel ID: #${id}`;
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #f7f7f7; padding: 10px; border-radius: 6px; border: 1px solid #eee;">${text}</span>`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #f7f7f7;">${text}</span>`;
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 
@@ -150,13 +150,13 @@ const SingleBooking = () => {
           </div>
           <div>
             <label className="tool-label">নোট (optional)</label>
-            <input 
+            <input
               id="commonNote"
               name="common_note"
               autoComplete="on"
-              value={form.note} 
-              onChange={(e) => setForm({ ...form, note: e.target.value })} 
-              className="tool-input" 
+              value={form.note}
+              onChange={(e) => setForm({ ...form, note: e.target.value })}
+              className="tool-input"
             />
           </div>
         </div>

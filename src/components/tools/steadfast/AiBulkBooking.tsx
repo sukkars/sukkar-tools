@@ -126,7 +126,7 @@ const AiBulkBooking = () => {
 
   const copyId = (id: string) => {
     const text = `Parcel ID: #${id}`;
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #e6fcf5; padding: 10px; border-radius: 6px; border: 1px solid #c3fae8;">${text}</span>`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; display: inline-block; background: #e6fcf5; padding: 10px; border-radius: 3px; border: 1px solid #c3fae8;">${text}</span>`;
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 
@@ -260,14 +260,14 @@ const AiBulkBooking = () => {
 
           <div className="tool-card !p-4 space-y-3">
             <label className="tool-label font-semibold">কমন নোট</label>
-            <input 
+            <input
               id="commonNote"
               name="common_note"
               autoComplete="on"
-              value={commonNote} 
-              onChange={(e) => setCommonNote(e.target.value)} 
-              placeholder="যেমন: সাবধানে ডেলিভারি করবেন" 
-              className="tool-input" 
+              value={commonNote}
+              onChange={(e) => setCommonNote(e.target.value)}
+              placeholder="যেমন: সাবধানে ডেলিভারি করবেন"
+              className="tool-input"
             />
             <button onClick={submitAll} disabled={submitting || !hasSteadfastKeys} className="tool-btn w-full disabled:opacity-50">
               {submitting ? "বুকিং চলছে..." : <><Send className="w-4 h-4" /> সবগুলো একসাথে বুকিং দিন</>}
