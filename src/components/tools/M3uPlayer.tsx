@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect, useCallback } from "react";
-import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Upload, Trash2, List, Radio, PictureInPicture2, Maximize2, Minimize2, Settings, ExternalLink } from "lucide-react";
+import { Play, Pause, SkipBack, SkipForward, Volume2, VolumeX, Upload, Trash2, List, Radio, PictureInPicture2, Maximize2, Minimize2, Settings, ExternalLink, Search, ChevronRight, Tv } from "lucide-react";
 import { toast } from "sonner";
-
+import Hls from "hls.js";
 
 interface Channel {
   name: string;
@@ -26,7 +26,7 @@ function parseM3U(text: string): RawChannel[] {
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (line.startsWith("#EXTINF:")) {
-      const nameMatch = line.match(/,(.+)$/);
+      const nameMatch = line.match(/tvg-name="([^"]*)"/) || line.match(/,(.+)$/);
       const logoMatch = line.match(/tvg-logo="([^"]*)"/);
       const groupMatch = line.match(/group-title="([^"]*)"/);
       current = {
@@ -42,7 +42,6 @@ function parseM3U(text: string): RawChannel[] {
   return channels;
 }
 
-// Group same-name channels as quality variants
 function groupChannels(raw: RawChannel[]): Channel[] {
   const map = new Map<string, Channel>();
   for (const ch of raw) {
@@ -63,7 +62,7 @@ function groupChannels(raw: RawChannel[]): Channel[] {
 const DEMO_URL = "https://peacetv.vercel.app/alltv.m3u";
 
 const M3uPlayer = () => {
-  const [mode, setMode] = useState<"single" | "playlist">("single");
+  const [mode, setMode] = useState<"single" | "playlist">("playlist");
   const [streamUrl, setStreamUrl] = useState("");
   const [channels, setChannels] = useState<Channel[]>([]);
   const [activeIdx, setActiveIdx] = useState(-1);
@@ -72,67 +71,124 @@ const M3uPlayer = () => {
   const [volume, setVolume] = useState(80);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
-  const [isVideo, setIsVideo] = useState(false);
   const [fullscreen, setFullscreen] = useState(false);
   const [showQuality, setShowQuality] = useState(false);
   const [activeQuality, setActiveQuality] = useState(0);
   const [playbackRate, setPlaybackRate] = useState(1);
-  const audioRef = useRef<HTMLAudioElement>(null);
+  const [hlsLevels, setHlsLevels] = useState<any[]>([]);
+  const [currentLevel, setCurrentLevel] = useState(-1);
+
   const videoRef = useRef<HTMLVideoElement>(null);
+  const hlsRef = useRef<Hls | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const activeChannel = activeIdx >= 0 ? channels[activeIdx] : null;
-  const currentUrl = mode === "single" ? streamUrl : activeChannel?.url || "";
+  const currentUrl = mode === "single" ? streamUrl : (activeChannel?.qualities ? activeChannel.qualities[activeQuality].url : activeChannel?.url || "");
+
+  const stopStream = useCallback(() => {
+    if (hlsRef.current) {
+      hlsRef.current.destroy();
+      hlsRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.pause();
+      videoRef.current.src = "";
+      videoRef.current.load();
+    }
+    setPlaying(false);
+    setHlsLevels([]);
+    setCurrentLevel(-1);
+  }, []);
 
   const playStream = useCallback((url: string) => {
+    if (!url) return;
+    stopStream();
     setError("");
-    const isVid = /\.(mp4|mkv|ts|m3u8)(\?|$)/i.test(url) || url.includes("video");
-    setIsVideo(isVid);
-    setTimeout(() => {
-      const el = isVid ? videoRef.current : audioRef.current;
-      if (!el) return;
-      el.src = url;
-      el.volume = volume / 100;
-      el.muted = muted;
-      el.playbackRate = playbackRate;
-      el.play().then(() => setPlaying(true)).catch((e) => {
-        setError(`Playback error: ${e.message}`);
-        setPlaying(false);
-      });
-    }, 50);
-  }, [volume, muted, playbackRate]);
 
-  const handlePlay = () => { if (!currentUrl) return; playStream(currentUrl); };
-  const handlePause = () => { audioRef.current?.pause(); videoRef.current?.pause(); setPlaying(false); };
+    const video = videoRef.current;
+    if (!video) return;
+
+    if (Hls.isSupported() && url.includes(".m3u8")) {
+      const hls = new Hls({
+        capLevelToPlayerSize: true,
+        autoStartLoad: true
+      });
+      hlsRef.current = hls;
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        setHlsLevels(hls.levels);
+        video.play().catch(e => {
+            if (e.name !== "AbortError") setError(`Playback error: ${e.message}`);
+        });
+      });
+      hls.on(Hls.Events.LEVEL_SWITCHED, (_, data) => {
+        setCurrentLevel(data.level);
+      });
+      hls.on(Hls.Events.ERROR, (_, data) => {
+        if (data.fatal) {
+          switch (data.type) {
+            case Hls.ErrorTypes.NETWORK_ERROR:
+              setError("Network error, trying to recover...");
+              hls.startLoad();
+              break;
+            case Hls.ErrorTypes.MEDIA_ERROR:
+              setError("Media error, trying to recover...");
+              hls.recoverMediaError();
+              break;
+            default:
+              setError("An unrecoverable error occurred");
+              stopStream();
+              break;
+          }
+        }
+      });
+    } else {
+      video.src = url;
+      video.play().catch(e => {
+        if (e.name !== "AbortError") setError(`Playback error: ${e.message}`);
+      });
+    }
+    setPlaying(true);
+  }, [stopStream]);
+
+  const handlePlayPause = () => {
+    if (videoRef.current) {
+      if (playing) {
+        videoRef.current.pause();
+        setPlaying(false);
+      } else {
+        videoRef.current.play().then(() => setPlaying(true));
+      }
+    }
+  };
 
   const selectChannel = (idx: number, qualityIdx = 0) => {
     setActiveIdx(idx);
     setActiveQuality(qualityIdx);
-    audioRef.current?.pause();
-    videoRef.current?.pause();
     const ch = channels[idx];
     const url = ch.qualities ? ch.qualities[qualityIdx].url : ch.url;
     playStream(url);
   };
 
-  const switchQuality = (qIdx: number) => {
-    if (!activeChannel?.qualities) return;
-    setActiveQuality(qIdx);
-    setShowQuality(false);
-    const url = activeChannel.qualities[qIdx].url;
-    audioRef.current?.pause();
-    videoRef.current?.pause();
-    playStream(url);
+  const switchHlsQuality = (level: number) => {
+    if (hlsRef.current) {
+      hlsRef.current.currentLevel = level;
+      setCurrentLevel(level);
+      setShowQuality(false);
+    }
   };
 
   const prev = () => { if (channels.length > 0) selectChannel((activeIdx - 1 + channels.length) % channels.length); };
   const next = () => { if (channels.length > 0) selectChannel((activeIdx + 1) % channels.length); };
 
   useEffect(() => {
-    const a = audioRef.current; const v = videoRef.current;
-    if (a) { a.volume = volume / 100; a.muted = muted; }
-    if (v) { v.volume = volume / 100; v.muted = muted; }
-  }, [volume, muted]);
+    if (videoRef.current) {
+      videoRef.current.volume = volume / 100;
+      videoRef.current.muted = muted;
+      videoRef.current.playbackRate = playbackRate;
+    }
+  }, [volume, muted, playbackRate]);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -144,26 +200,27 @@ const M3uPlayer = () => {
       if (parsed.length === 0) { toast.error("No channels found"); return; }
       setChannels(parsed); setMode("playlist");
       toast.success(`Loaded ${parsed.length} channels`);
+      if (parsed.length > 0) selectChannel(0);
     };
     reader.readAsText(file);
   };
 
   const loadUrl = async (url: string) => {
     if (!url) return;
-    const isM3u = /\.m3u8?/i.test(url) || url.includes("m3u");
-    if (!isM3u) { playStream(url); return; }
-    try {
-      const res = await fetch(url);
-      const text = await res.text();
-      const parsed = groupChannels(parseM3U(text));
-      if (parsed.length > 0) {
-        setChannels(parsed); setMode("playlist");
-        toast.success(`Loaded ${parsed.length} channels`);
-      } else { playStream(url); }
-    } catch { playStream(url); }
+    const isPlaylist = url.endsWith(".m3u") || url.includes("m3u");
+    if (isPlaylist) {
+      try {
+        const res = await fetch(url);
+        const text = await res.text();
+        const parsed = groupChannels(parseM3U(text));
+        if (parsed.length > 0) {
+          setChannels(parsed); setMode("playlist");
+          toast.success(`Loaded ${parsed.length} channels`);
+          selectChannel(0);
+        } else { playStream(url); }
+      } catch { playStream(url); }
+    } else { playStream(url); }
   };
-
-  const handleUrlLoad = () => loadUrl(streamUrl);
 
   const toggleFullscreen = () => {
     if (!containerRef.current) return;
@@ -174,223 +231,198 @@ const M3uPlayer = () => {
     }
   };
 
-  const openPiP = async () => {
-    const v = videoRef.current;
-    if (!v || !v.src) { toast.error("PiP requires an active video stream"); return; }
-    try {
-      await v.requestPictureInPicture();
-    } catch (e: any) {
-      toast.error("PiP not supported: " + e.message);
-    }
-  };
-
-  const changeSpeed = () => {
-    const speeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
-    const next = speeds[(speeds.indexOf(playbackRate) + 1) % speeds.length];
-    setPlaybackRate(next);
-    if (audioRef.current) audioRef.current.playbackRate = next;
-    if (videoRef.current) videoRef.current.playbackRate = next;
-  };
-
   useEffect(() => {
     const handler = () => setFullscreen(!!document.fullscreenElement);
     document.addEventListener("fullscreenchange", handler);
-    return () => document.removeEventListener("fullscreenchange", handler);
-  }, []);
+    return () => {
+        document.removeEventListener("fullscreenchange", handler);
+        stopStream();
+    };
+  }, [stopStream]);
 
   const filteredChannels = channels.filter((c) =>
     c.name.toLowerCase().includes(search.toLowerCase()) ||
     (c.group || "").toLowerCase().includes(search.toLowerCase())
   );
-  const groups = [...new Set(channels.map((c) => c.group).filter(Boolean))];
 
   return (
-    <div className="space-y-4">
-      <h2 className="tool-title">M3U Player</h2>
-      <p className="tool-description">Play streams or load M3U playlists with quality selection</p>
-      {/* Mode tabs */}
-      <div className="flex gap-2">
-        <button onClick={() => setMode("single")} className={mode === "single" ? "tool-btn text-xs" : "tool-btn-outline text-xs"}>
-          <Radio className="w-3 h-3" /> Single Stream
-        </button>
-        <button onClick={() => setMode("playlist")} className={mode === "playlist" ? "tool-btn text-xs" : "tool-btn-outline text-xs"}>
-          <List className="w-3 h-3" /> Playlist
-        </button>
-      </div>
-
-      {/* URL input */}
-      <div className="flex gap-2">
-        <input value={streamUrl} onChange={(e) => setStreamUrl(e.target.value)}
-          placeholder="Enter stream URL or M3U playlist URL..."
-          className="tool-input flex-1" onKeyDown={(e) => e.key === "Enter" && handleUrlLoad()} />
-        <button onClick={handleUrlLoad} className="tool-btn !px-4"><Play className="w-4 h-4" /></button>
-      </div>
-
-      {/* Demo suggestion */}
-      {channels.length === 0 && (
-        <button
-          onClick={() => { setStreamUrl(DEMO_URL); loadUrl(DEMO_URL); }}
-          className="w-full text-left tool-card !p-3 hover:border-primary/30 transition-colors cursor-pointer flex items-center gap-3"
-        >
-          <ExternalLink className="w-4 h-4 text-primary flex-shrink-0" />
-          <div className="min-w-0">
-            <div className="text-sm font-medium">Try this: Peace TV Playlist</div>
-            <div className="text-xs text-muted-foreground truncate">{DEMO_URL}</div>
-          </div>
-        </button>
-      )}
-
-      {/* File upload */}
-      <label className="tool-btn-outline w-full cursor-pointer text-center block">
-        <Upload className="w-4 h-4 inline mr-2" /> Load M3U File
-        <input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
-      </label>
-
-      {error && <div className="text-sm text-destructive bg-destructive/10 rounded-lg p-3">{error}</div>}
-
-      {/* Video player container */}
-      <div ref={containerRef} className={`relative ${fullscreen ? "bg-black" : ""}`}>
-        <video ref={videoRef} controls={false}
-          className={`w-full rounded-xl bg-black ${isVideo && playing ? "block" : "hidden"} ${fullscreen ? "h-screen object-contain" : ""}`}
-          onClick={() => playing ? handlePause() : handlePlay()} />
-
-        {/* Overlay controls for video */}
-        {isVideo && playing && (
-          <div className="absolute bottom-0 left-0 right-0 p-3 bg-gradient-to-t from-black/70 to-transparent flex items-center gap-2 rounded-b-xl opacity-0 hover:opacity-100 transition-opacity">
-            <button onClick={handlePause} className="text-white p-1"><Pause className="w-5 h-5" /></button>
-            <div className="flex-1" />
-            <button onClick={changeSpeed} className="text-white text-xs font-mono px-2 py-1 rounded bg-white/20 hover:bg-white/30">{playbackRate}x</button>
-            {activeChannel?.qualities && (
-              <div className="relative">
-                <button onClick={() => setShowQuality(!showQuality)} className="text-white p-1"><Settings className="w-4 h-4" /></button>
-                {showQuality && (
-                  <div className="absolute bottom-8 right-0 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[120px] z-10">
-                    {activeChannel.qualities.map((q, qi) => (
-                      <button key={qi} onClick={() => switchQuality(qi)}
-                        className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted ${qi === activeQuality ? "text-primary font-medium" : ""}`}>
-                        {q.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-            <button onClick={openPiP} className="text-white p-1" title="Picture-in-Picture"><PictureInPicture2 className="w-4 h-4" /></button>
-            <button onClick={toggleFullscreen} className="text-white p-1">
-              {fullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h2 className="tool-title">M3U Player Pro</h2>
+          <p className="tool-description">High-performance stream player with HLS support and sidebar</p>
+        </div>
+        <div className="flex gap-2">
+            <label className="tool-btn-outline cursor-pointer text-xs py-2">
+                <Upload className="w-3.5 h-3.5 mr-2" /> Load M3U
+                <input type="file" accept=".m3u,.m3u8,.txt" onChange={handleFileUpload} className="hidden" />
+            </label>
+            <button onClick={() => { setStreamUrl(DEMO_URL); loadUrl(DEMO_URL); }} className="tool-btn text-xs py-2">
+                <Tv className="w-3.5 h-3.5 mr-2" /> Try Demo
             </button>
-          </div>
-        )}
+        </div>
       </div>
 
-      <audio ref={audioRef} onEnded={next} onError={() => setError("Stream failed to load")} />
-
-      {/* Compact controls bar */}
-      <div className="tool-card !p-2.5 space-y-1.5">
-        {/* Now playing + main controls in one row */}
-        <div className="flex items-center gap-2">
-          {mode === "playlist" && <button onClick={prev} disabled={channels.length === 0} className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-40"><SkipBack className="w-4 h-4" /></button>}
-          {playing ? (
-            <button onClick={handlePause} className="tool-btn !rounded-full !p-2"><Pause className="w-4 h-4" /></button>
-          ) : (
-            <button onClick={handlePlay} disabled={!currentUrl} className="tool-btn !rounded-full !p-2 disabled:opacity-40"><Play className="w-4 h-4" /></button>
-          )}
-          {mode === "playlist" && <button onClick={next} disabled={channels.length === 0} className="p-1.5 rounded-lg hover:bg-muted disabled:opacity-40"><SkipForward className="w-4 h-4" /></button>}
-
-          <div className="flex-1 min-w-0 px-1">
-            <div className="text-sm font-medium truncate">{playing ? (activeChannel?.name || streamUrl || "—") : "No stream"}</div>
-            {playing && activeChannel?.qualities && (
-              <div className="text-[10px] text-primary">{activeChannel.qualities[activeQuality]?.label}</div>
-            )}
-          </div>
-
-          {/* Inline mini controls */}
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <button onClick={changeSpeed} className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-muted hover:bg-muted/80">{playbackRate}x</button>
-            {activeChannel?.qualities && (
-              <div className="relative">
-                <button onClick={() => setShowQuality(!showQuality)} className="p-1.5 rounded hover:bg-muted" title="Quality / Source">
-                  <Settings className="w-3.5 h-3.5" />
-                </button>
-                {showQuality && (
-                  <div className="absolute bottom-8 right-0 bg-popover border border-border rounded-lg shadow-lg py-1 min-w-[130px] z-10">
-                    <div className="px-3 py-1 text-[10px] font-semibold uppercase text-muted-foreground tracking-wider">Source / Quality</div>
-                    {activeChannel.qualities.map((q, qi) => (
-                      <button key={qi} onClick={() => switchQuality(qi)}
-                        className={`w-full text-left px-3 py-1.5 text-sm hover:bg-muted ${qi === activeQuality ? "text-primary font-medium" : ""}`}>
-                        {q.label}
-                      </button>
-                    ))}
-                  </div>
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-card border border-border rounded-2xl overflow-hidden shadow-xl min-h-[600px]">
+        {/* Main Player Section */}
+        <div className="lg:col-span-8 flex flex-col bg-black/5">
+            <div ref={containerRef} className={`relative aspect-video bg-black group ${fullscreen ? "fixed inset-0 z-[100] w-full h-full" : ""}`}>
+                <video ref={videoRef} className="w-full h-full" onClick={handlePlayPause} playsInline />
+                
+                {/* Connecting overlay */}
+                {!playing && mode === "playlist" && channels.length > 0 && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10 pointer-events-none">
+                        <div className="text-center">
+                            <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+                            <p className="text-white font-medium">Connecting Stream...</p>
+                        </div>
+                    </div>
                 )}
-              </div>
-            )}
-            {/* Volume toggle with hover slider */}
-            <div className="relative group/vol">
-              <button onClick={() => setMuted(!muted)} className="p-1.5 rounded hover:bg-muted">
-                {muted ? <VolumeX className="w-3.5 h-3.5" /> : <Volume2 className="w-3.5 h-3.5" />}
-              </button>
-              <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 hidden group-hover/vol:flex flex-col items-center bg-popover border border-border rounded-lg shadow-lg p-2 z-10">
-                <input type="range" min={0} max={100} value={muted ? 0 : volume}
-                  onChange={(e) => { setVolume(Number(e.target.value)); setMuted(false); }}
-                  className="w-20 h-1.5 rounded-full bg-muted appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary"
-                  style={{ writingMode: "horizontal-tb" }} />
-                <span className="text-[10px] font-mono text-muted-foreground mt-1">{muted ? 0 : volume}%</span>
-              </div>
+
+                {/* Player Controls Overlay */}
+                <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-4">
+                        <button onClick={handlePlayPause} className="text-white hover:text-primary transition-colors">
+                            {playing ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                        </button>
+                        <div className="flex-1">
+                            <div className="text-white text-sm font-medium truncate">
+                                {activeChannel?.name || "No Channel Selected"}
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="w-2 h-2 bg-red-500 rounded-full animate-pulse" />
+                                <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Live</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-3">
+                            {/* Quality Selector */}
+                            {(hlsLevels.length > 0) && (
+                                <div className="relative">
+                                    <button onClick={() => setShowQuality(!showQuality)} className="text-gray-300 hover:text-white flex items-center gap-1 text-[10px] font-bold">
+                                        {currentLevel === -1 ? "AUTO" : `${hlsLevels[currentLevel]?.height}P`}
+                                        <Settings className="w-3.5 h-3.5" />
+                                    </button>
+                                    {showQuality && (
+                                        <div className="absolute bottom-full right-0 mb-2 bg-popover border border-border rounded-xl shadow-2xl py-2 min-w-[120px] z-50 overflow-hidden">
+                                            <div className="px-3 py-1.5 text-[10px] font-bold text-muted-foreground uppercase border-b border-border/50 mb-1">Quality</div>
+                                            <button onClick={() => switchHlsQuality(-1)} className={`w-full text-left px-4 py-2 text-xs hover:bg-muted ${currentLevel === -1 ? "text-primary font-bold" : ""}`}>Auto</button>
+                                            {hlsLevels.map((l, i) => (
+                                                <button key={i} onClick={() => switchHlsQuality(i)} className={`w-full text-left px-4 py-2 text-xs hover:bg-muted ${currentLevel === i ? "text-primary font-bold" : ""}`}>{l.height}p</button>
+                                            ))}
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                            <button onClick={() => videoRef.current?.requestPictureInPicture()} className="text-gray-300 hover:text-white"><PictureInPicture2 className="w-5 h-5" /></button>
+                            <button onClick={toggleFullscreen} className="text-gray-300 hover:text-white">
+                                {fullscreen ? <Minimize2 className="w-5 h-5" /> : <Maximize2 className="w-5 h-5" />}
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
-            {isVideo && playing && (
-              <>
-                <button onClick={openPiP} className="p-1.5 rounded hover:bg-muted" title="Picture-in-Picture">
-                  <PictureInPicture2 className="w-3.5 h-3.5" />
-                </button>
-                <button onClick={toggleFullscreen} className="p-1.5 rounded hover:bg-muted" title="Fullscreen">
-                  {fullscreen ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
-                </button>
-              </>
+
+            {/* Info and Volume */}
+            <div className="p-6 space-y-4 flex-1">
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div className="flex items-center gap-4">
+                        <div className="w-14 h-14 rounded-xl bg-muted flex items-center justify-center border border-border group overflow-hidden shadow-inner">
+                            {activeChannel?.logo ? (
+                                <img src={activeChannel.logo} className="w-full h-full object-contain" alt="" onError={e => (e.target as any).style.display='none'} />
+                            ) : (
+                                <Tv className="w-6 h-6 text-muted-foreground" />
+                            )}
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-bold">{activeChannel?.name || "Select a channel"}</h3>
+                            <p className="text-xs text-muted-foreground">{activeChannel?.group || "General"}</p>
+                        </div>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 bg-muted/30 p-2 rounded-xl border border-border/50">
+                        <button onClick={() => setMuted(!muted)} className="p-2 hover:bg-muted rounded-lg transition-colors">
+                            {muted || volume === 0 ? <VolumeX className="w-4 h-4 text-muted-foreground" /> : <Volume2 className="w-4 h-4 text-primary" />}
+                        </button>
+                        <input type="range" min="0" max="100" value={muted ? 0 : volume} onChange={e => {setVolume(Number(e.target.value)); setMuted(false);}} 
+                            className="w-24 h-1.5 rounded-full bg-muted appearance-none cursor-pointer accent-primary" />
+                        <span className="text-[10px] font-mono w-8 text-right text-muted-foreground">{muted ? 0 : volume}%</span>
+                    </div>
+                </div>
+
+                <div className="flex gap-2">
+                    <input value={streamUrl} onChange={e => setStreamUrl(e.target.value)} placeholder="Paste stream URL or M3U link..." 
+                        className="tool-input flex-1 text-sm h-11" onKeyDown={e => e.key === "Enter" && loadUrl(streamUrl)} />
+                    <button onClick={() => loadUrl(streamUrl)} className="tool-btn !h-11 px-6">Play</button>
+                </div>
+
+                {error && <div className="text-xs text-red-500 bg-red-500/10 border border-red-500/20 p-3 rounded-xl flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 bg-red-500 rounded-full" /> {error}
+                </div>}
+            </div>
+        </div>
+
+        {/* Sidebar Directory */}
+        <div className="lg:col-span-4 flex flex-col border-l border-border bg-muted/10 h-full">
+            <div className="p-4 border-b border-border bg-card">
+                <div className="flex items-center justify-between mb-3">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Directory</h4>
+                    <span className="bg-primary/10 text-primary text-[10px] font-bold px-2 py-0.5 rounded-full">{channels.length} CH</span>
+                </div>
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search channels..." 
+                        className="tool-input !pl-10 !py-2 text-sm !bg-muted/50 focus:!bg-card" />
+                </div>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-thin">
+                {channels.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center p-8 text-center h-full opacity-50">
+                        <Tv className="w-12 h-12 mb-3" />
+                        <p className="text-sm font-medium">Your playlist is empty</p>
+                        <p className="text-[10px]">Load a file or paste a link to start</p>
+                    </div>
+                ) : (
+                    filteredChannels.map((ch, idx) => {
+                        const originalIdx = channels.indexOf(ch);
+                        const isActive = originalIdx === activeIdx;
+                        return (
+                            <button key={originalIdx} onClick={() => selectChannel(originalIdx)}
+                                className={`w-full group flex items-center gap-3 p-2.5 rounded-xl text-left transition-all ${isActive ? "bg-primary/10 border border-primary/20 shadow-sm" : "hover:bg-muted border border-transparent"}`}>
+                                <div className={`w-10 h-10 rounded-lg flex-shrink-0 flex items-center justify-center border transition-all ${isActive ? "bg-primary border-primary" : "bg-card border-border/50 group-hover:border-primary/30"}`}>
+                                    {ch.logo ? (
+                                        <img src={ch.logo} className="w-full h-full object-contain p-1" alt="" onError={e => (e.target as any).style.display='none'} />
+                                    ) : (
+                                        <Tv className={`w-4 h-4 ${isActive ? "text-white" : "text-muted-foreground"}`} />
+                                    )}
+                                </div>
+                                <div className="min-w-0 flex-1">
+                                    <p className={`text-sm font-semibold truncate ${isActive ? "text-primary" : "text-card-foreground"}`}>{ch.name}</p>
+                                    <p className="text-[10px] text-muted-foreground truncate opacity-70">{ch.group || "General"}</p>
+                                </div>
+                                {isActive ? (
+                                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
+                                        <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                    </div>
+                                ) : (
+                                    <ChevronRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                                )}
+                            </button>
+                        );
+                    })
+                )}
+            </div>
+
+            {channels.length > 0 && (
+                <div className="p-3 border-t border-border bg-card/50">
+                    <button onClick={() => { setChannels([]); setActiveIdx(-1); stopStream(); }} 
+                        className="w-full py-2 flex items-center justify-center gap-2 text-[10px] font-bold text-muted-foreground hover:text-red-500 hover:bg-red-500/5 rounded-lg transition-all">
+                        <Trash2 className="w-3.5 h-3.5" /> Clear Playlist
+                    </button>
+                </div>
             )}
-          </div>
         </div>
       </div>
-
-      {/* Playlist */}
-      {mode === "playlist" && channels.length > 0 && (
-        <div className="space-y-2">
-          <div className="flex gap-2 items-center">
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search channels..." className="tool-input flex-1" />
-            <button onClick={() => { setChannels([]); setActiveIdx(-1); handlePause(); }} className="tool-btn-outline !px-3" title="Clear playlist">
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="text-xs text-muted-foreground">{channels.length} channels{groups.length > 0 ? ` · ${groups.length} groups` : ""}</div>
-
-          <div className="tool-card !p-0 max-h-80 overflow-y-auto divide-y divide-border">
-            {filteredChannels.map((ch, i) => {
-              const realIdx = channels.indexOf(ch);
-              return (
-                <button key={i} onClick={() => selectChannel(realIdx)}
-                  className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors hover:bg-muted/50 ${realIdx === activeIdx ? "bg-primary/10" : ""}`}>
-                  {ch.logo ? (
-                    <img src={ch.logo} alt="" className="w-8 h-8 rounded object-cover flex-shrink-0"
-                      onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                  ) : (
-                    <div className="w-8 h-8 rounded bg-muted flex items-center justify-center flex-shrink-0">
-                      <Radio className="w-3.5 h-3.5 text-muted-foreground" />
-                    </div>
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <div className={`text-sm truncate ${realIdx === activeIdx ? "font-semibold text-primary" : ""}`}>{ch.name}</div>
-                    <div className="flex items-center gap-2">
-                      {ch.group && <span className="text-xs text-muted-foreground truncate">{ch.group}</span>}
-                      {ch.qualities && <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">{ch.qualities.length} sources</span>}
-                    </div>
-                  </div>
-                  {realIdx === activeIdx && playing && <span className="w-2 h-2 rounded-full bg-primary animate-pulse flex-shrink-0" />}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
     </div>
   );
 };
