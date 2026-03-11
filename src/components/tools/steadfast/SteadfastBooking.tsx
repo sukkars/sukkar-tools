@@ -53,21 +53,25 @@ const SteadfastBooking = () => {
             <button
               key={t.id}
               onClick={() => handleTabChange(t.id)}
-              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                tab === t.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded-md text-sm font-medium transition-colors ${tab === t.id ? "bg-background text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
+                }`}
             >
               <Icon className="w-4 h-4" />
               {t.label}
             </button>
           );
         })}
+
       </div>
 
       {/* Tab content */}
       {tab === "single" && <SingleBooking />}
       {tab === "bulk" && <BulkBooking />}
       {tab === "ai" && <AiBulkBooking />}
+
+      <p className="text-xs text-muted-foreground text-center">
+        Disclaimer: This is not an official Steadfast project.
+      </p>
     </div>
   );
 };

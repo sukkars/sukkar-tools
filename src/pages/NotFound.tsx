@@ -17,6 +17,9 @@ const NotFound = () => {
           Return to Home
         </a>
       </div>
+      <a href="https://sukkarshop.com" target="_blank" className="text-primary underline hover:text-primary/90">
+        Return to SukkarShop
+      </a>
     </div>
   );
 };
