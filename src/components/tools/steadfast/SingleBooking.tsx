@@ -69,7 +69,7 @@ const SingleBooking = () => {
     if (!id) return;
     const text = `Parcel Id : #${id}`;
     // Using 16pt as requested/seen in original tool for large rich text copy
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #c2c2c2ff; padding: 4px;">${text}</span>`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #a8a8a8ff; padding: 4px;">${text}</span>`;
 
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });

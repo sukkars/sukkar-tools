@@ -127,7 +127,7 @@ const AiBulkBooking = () => {
   const copyId = (id: string | undefined) => {
     if (!id) return;
     const text = `Parcel Id : #${id}`;
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #c2c2c2; padding: 4px;">${text}</span>`;
+    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #a8a8a8ff; padding: 4px;">${text}</span>`;
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 

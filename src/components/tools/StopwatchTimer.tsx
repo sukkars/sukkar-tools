@@ -95,8 +95,21 @@ const StopwatchTimer = () => {
       canvas.width = 300;
       canvas.height = 120;
 
+      // Draw one frame first so the stream has content
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.fillStyle = "#1a1a2e";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#eeeeee";
+        ctx.font = "bold 36px monospace";
+        ctx.textAlign = "center";
+        ctx.fillText(formatTime(msRef.current), canvas.width / 2, 75);
+      }
+
       const stream = canvas.captureStream(30);
       video.srcObject = stream;
+
+      // play() must resolve before requestPictureInPicture()
       await video.play();
       await (video as any).requestPictureInPicture();
 
@@ -108,10 +121,10 @@ const StopwatchTimer = () => {
         video.srcObject = null;
         setPipOpen(false);
       }, { once: true });
-    } catch {
-      // PiP not supported, silently fail
+    } catch (err) {
+      console.error("PiP failed:", err);
     }
-  }, [drawPipCanvas]);
+  }, [drawPipCanvas, formatTime]);
 
   const closePip = useCallback(() => {
     if (document.pictureInPictureElement) {
@@ -177,8 +190,8 @@ const StopwatchTimer = () => {
   return (
     <div className="space-y-4">
       {/* Hidden elements for true PiP */}
-      <canvas ref={pipCanvasRef} className="hidden" />
-      <video ref={pipVideoRef} className="hidden" muted playsInline />
+      <canvas ref={pipCanvasRef} style={{ position: "absolute", left: "-9999px", top: 0, width: 300, height: 120 }} />
+      <video ref={pipVideoRef} style={{ position: "absolute", left: "-9999px", top: 0, width: 1, height: 1 }} muted playsInline autoPlay />
 
       <div className="flex items-center justify-between">
         <h2 className="tool-title">Stopwatch & Timer</h2>
