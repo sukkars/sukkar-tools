@@ -69,7 +69,7 @@ const SteadfastBooking = () => {
       {tab === "bulk" && <BulkBooking />}
       {tab === "ai" && <AiBulkBooking />}
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p className="text-[10px] text-muted-foreground text-center">
         Disclaimer: This is not an official Steadfast project.
       </p>
     </div>

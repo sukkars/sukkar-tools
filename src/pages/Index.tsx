@@ -216,7 +216,7 @@ const ToolFooter = ({ toolTitle, version }: { toolTitle?: string; version?: stri
         <a href="https://sukkarshop.com" target="_blank" rel="noopener" className="hover:text-primary">sukkarshop.com</a>
       </p>
       <p className="text-[11px] text-muted-foreground/70">
-        All tools run entirely in your browser — no data is sent to any server. Use at your own responsibility.
+        All tools run entirely in your browser — we do not collect any personal data. Use at your own responsibility.
       </p>
     </footer>
   );
