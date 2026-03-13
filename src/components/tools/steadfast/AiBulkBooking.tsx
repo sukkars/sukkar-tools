@@ -127,7 +127,8 @@ const AiBulkBooking = () => {
   const copyId = (id: string | undefined) => {
     if (!id) return;
     const text = `Parcel Id : #${id}`;
-    const html = `<span style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000; background-color: #a8a8a8ff; padding: 4px;">${text}</span>`;
+    const html = `<div style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000000; background-color: #e2e8f0; padding: 4px 8px; border-radius: 4px; display: inline-block;">${text}</div>`;
+
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
 
@@ -138,10 +139,11 @@ const AiBulkBooking = () => {
           "text/plain": textBlob,
         }),
       ]).then(() => {
-        toast.success("ID Copied!");
-      }).catch(() => {
+        toast.success("Parcel ID copied with formatting!");
+      }).catch((err) => {
+        console.error("Clipboard write failed:", err);
         navigator.clipboard.writeText(text);
-        toast.success("ID Copied!");
+        toast.success("Parcel ID copied!");
       });
     } else {
       const el = document.createElement('textarea');
@@ -150,7 +152,7 @@ const AiBulkBooking = () => {
       el.select();
       document.execCommand('copy');
       document.body.removeChild(el);
-      toast.success("ID Copied!");
+      toast.success("Parcel ID copied!");
     }
   };
 
