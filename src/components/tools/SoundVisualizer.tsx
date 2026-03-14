@@ -28,7 +28,7 @@ const THEMES: { id: ThemeName; label: string; color: string }[] = [
   { id: "plain", label: "Plain", color: "bg-indigo-500" },
 ];
 
-const VisualSoundRecorder = () => {
+const SoundVisualizer = () => {
   const {
     state, sensitivity, setSensitivity, smoothness, setSmoothness,
     currentStyle, setCurrentStyle, theme, setTheme,
@@ -112,7 +112,7 @@ const VisualSoundRecorder = () => {
   // Canvas container style based on orientation
   const canvasContainerStyle: React.CSSProperties = isPortrait
     ? { width: "min(100%, 250px)", margin: "0 auto", aspectRatio: "9/16" }
-    : { width: "100%", height: "350px" };
+    : { width: "100%", aspectRatio: "16/9" };
 
   return (
     <div className="space-y-4">
@@ -237,4 +237,4 @@ const VisualSoundRecorder = () => {
   );
 };
 
-export default VisualSoundRecorder;
+export default SoundVisualizer;

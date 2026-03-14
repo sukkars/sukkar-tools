@@ -166,7 +166,7 @@ export const tools: ToolDef[] = [
     howToUseEn: ["Click Start and allow microphone access.", "Speak — live text appears on screen.", "Click Stop, then Copy to copy the transcribed text."]
   },
   {
-    id: "sound-viz", title: "Visual Sound Recorder", description: "Mic visualizer & recorder", icon: AudioWaveform, category: "media", version: "v2.2",
+    id: "sound-viz", title: "Sound Visualizer", description: "Mic visualizer & recorder", icon: AudioWaveform, category: "media", version: "v2.3",
     howToUse: ["'Start Mic' বাটনে ক্লিক করে মাইক্রোফোন চালু করুন।", "Visualization style (Bars, Wave, Circles) ও color theme বেছে নিন।", "Portrait/Landscape বাটন দিয়ে ক্যানভাসের orientation পরিবর্তন করুন।", "Record বাটনে ক্লিক করে ভিডিও রেকর্ড করুন।", "Audio Record বাটনে শুধু অডিও রেকর্ড করুন।"],
     howToUseEn: ["Click 'Start Mic' to enable your microphone.", "Choose a visualization style (Bars, Wave, Circles) and color theme.", "Use the Portrait/Landscape toggle to change canvas orientation.", "Click Record to capture video, or Audio Record for audio only."]
   },

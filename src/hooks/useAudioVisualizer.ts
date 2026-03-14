@@ -45,7 +45,7 @@ export function useAudioVisualizer() {
     status: "Mic inactive",
     statusType: "idle",
   });
-  const [sensitivity, setSensitivity] = useState(100);
+  const [sensitivity, setSensitivity] = useState(150);
   const [smoothness, setSmoothness] = useState(5);
   const [currentStyle, setCurrentStyle] = useState<VisualizerStyle>("bars");
   const [theme, setTheme] = useState<ThemeName>("ocean");
