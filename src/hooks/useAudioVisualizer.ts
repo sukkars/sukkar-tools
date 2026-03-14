@@ -207,15 +207,19 @@ export function useAudioVisualizer() {
       } else if (currentStyle === "rounded") {
         const cx = w / 2;
         const cy = h / 2;
-        const baseRadius = Math.min(w, h) * 0.25;
-        const numPoints = dataArray.length;
+        const avgVal = dataArray.reduce((s, v) => s + v, 0) / dataArray.length / 255;
+        const globalPulsation = applySmoothing(avgVal * sens, 888); // Use fixed index for global smoothing
+        
+        const baseRadius = Math.min(w, h) * 0.25 * (1 + globalPulsation * 0.4);
+        const numPoints = 120; // Enough for a smooth circle
         ctx.beginPath();
         for (let i = 0; i <= numPoints; i++) {
-          const idx = i % numPoints;
+          const idx = Math.floor((i % numPoints) * (dataArray.length / numPoints));
           const raw = dataArray[idx] / 255;
           const val = applySmoothing(raw * sens, idx);
           const angle = (i / numPoints) * Math.PI * 2 - Math.PI / 2;
-          const r = baseRadius + val * baseRadius * 0.8;
+          // Combine global pulsation with local frequency waves
+          const r = baseRadius + val * (baseRadius * 0.3);
           const x = cx + r * Math.cos(angle);
           const y = cy + r * Math.sin(angle);
           if (i === 0) ctx.moveTo(x, y);
@@ -232,8 +236,8 @@ export function useAudioVisualizer() {
         ctx.strokeStyle = colors.accentStart;
         ctx.lineWidth = 2;
         ctx.stroke();
-        const avgVal = dataArray.reduce((s, v) => s + v, 0) / dataArray.length / 255;
-        const innerR = baseRadius * 0.4 * (1 + avgVal * 0.3);
+        
+        const innerR = baseRadius * 0.4;
         if (centerImageObjRef.current?.complete) {
           ctx.save();
           ctx.beginPath();
@@ -244,7 +248,7 @@ export function useAudioVisualizer() {
           ctx.strokeStyle = colors.accentStart;
           ctx.lineWidth = 3;
           ctx.shadowColor = colors.glow;
-          ctx.shadowBlur = 20 + avgVal * 30;
+          ctx.shadowBlur = 20 + globalPulsation * 30;
           ctx.beginPath();
           ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
           ctx.stroke();
@@ -542,11 +546,23 @@ export function useAudioVisualizer() {
     }
   }, []);
 
+  const toggleFullscreen = useCallback((element: HTMLElement | null) => {
+    if (!element) return;
+    if (!document.fullscreenElement) {
+      element.requestFullscreen().catch((err) => {
+        console.error(`Error attempting to enable fullscreen: ${err.message}`);
+      });
+    } else {
+      document.exitFullscreen();
+    }
+  }, []);
+
   return {
     state, sensitivity, setSensitivity, smoothness, setSmoothness,
     currentStyle, setCurrentStyle, theme, setTheme,
     orientation, setOrientation,
     canvasRef, pipCanvasRef, pipVideoRef, setCenterImage,
     startMic, stopMic, toggleRecording, togglePip, exportAudioOnly,
+    toggleFullscreen,
   };
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Mic, Square, CircleDot, ExternalLink, AlertCircle, CheckCircle2, Info, ImagePlus, X, Music, Smartphone, Monitor } from "lucide-react";
+import { Mic, Square, CircleDot, ExternalLink, AlertCircle, CheckCircle2, Info, ImagePlus, X, Music, Smartphone, Monitor, Maximize } from "lucide-react";
 import { useAudioVisualizer, type VisualizerStyle, type ThemeName } from "@/hooks/useAudioVisualizer";
 
 
@@ -35,6 +35,7 @@ const SoundVisualizer = () => {
     orientation, setOrientation,
     canvasRef, pipCanvasRef, pipVideoRef, setCenterImage,
     startMic, stopMic, toggleRecording, togglePip, exportAudioOnly,
+    toggleFullscreen,
   } = useAudioVisualizer();
 
   const containerRef = useRef<HTMLDivElement>(null);
@@ -186,9 +187,14 @@ const SoundVisualizer = () => {
         </button>
       </div>
 
-      <button onClick={togglePip} disabled={!state.isActive} className="tool-btn w-full flex items-center justify-center gap-1.5 disabled:opacity-40">
-        <ExternalLink className="w-4 h-4" /> Picture-in-Picture
-      </button>
+      <div className="flex gap-2">
+        <button onClick={togglePip} disabled={!state.isActive} className="tool-btn flex-1 flex items-center justify-center gap-1.5 disabled:opacity-40">
+          <ExternalLink className="w-4 h-4" /> Picture-in-Picture
+        </button>
+        <button onClick={() => toggleFullscreen(containerRef.current)} disabled={!state.isActive} className="tool-btn flex-1 flex items-center justify-center gap-1.5 disabled:opacity-40">
+          <Maximize className="w-4 h-4" /> Fullscreen
+        </button>
+      </div>
 
       {/* Settings */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
