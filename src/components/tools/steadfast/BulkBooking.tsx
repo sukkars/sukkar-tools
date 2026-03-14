@@ -58,7 +58,7 @@ const BulkBooking = () => {
   const copyId = (id: string | undefined) => {
     if (!id) return;
     const text = `Parcel Id : #${id}`;
-    const html = `<div style="font-family: 'Poppins', sans-serif; font-size: 16pt; font-weight: bold; color: #000000; background-color: #e2e8f0; padding: 4px 8px; border-radius: 4px; display: inline-block;">${text}</div>`;
+    const html = `<span style="font-family:'Poppins', sans-serif; font-size:16pt; font-weight:bold; color:#000; background: linear-gradient(transparent 60%, #cfcfcf 60%); padding: 0 2px;">${text}</span>`;
 
     const blob = new Blob([html], { type: "text/html" });
     const textBlob = new Blob([text], { type: "text/plain" });
