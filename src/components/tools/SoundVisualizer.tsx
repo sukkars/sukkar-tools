@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
-import { Mic, Square, CircleDot, ExternalLink, AlertCircle, CheckCircle2, Info, ImagePlus, X, Music } from "lucide-react";
+import { Mic, Square, CircleDot, ExternalLink, AlertCircle, CheckCircle2, Info, ImagePlus, X, Music, Smartphone, Monitor } from "lucide-react";
 import { useAudioVisualizer, type VisualizerStyle, type ThemeName } from "@/hooks/useAudioVisualizer";
 
 
@@ -24,12 +24,15 @@ const THEMES: { id: ThemeName; label: string; color: string }[] = [
   { id: "blood", label: "Blood Moon", color: "bg-red-600" },
   { id: "galaxy", label: "Galaxy", color: "bg-violet-500" },
   { id: "neon", label: "Neon", color: "bg-lime-400" },
+  { id: "light", label: "Light", color: "bg-sky-200 border-2 border-slate-300" },
+  { id: "plain", label: "Plain", color: "bg-indigo-500" },
 ];
 
-const SoundVisualizer = () => {
+const VisualSoundRecorder = () => {
   const {
     state, sensitivity, setSensitivity, smoothness, setSmoothness,
     currentStyle, setCurrentStyle, theme, setTheme,
+    orientation, setOrientation,
     canvasRef, pipCanvasRef, pipVideoRef, setCenterImage,
     startMic, stopMic, toggleRecording, togglePip, exportAudioOnly,
   } = useAudioVisualizer();
@@ -39,6 +42,9 @@ const SoundVisualizer = () => {
   const [centerImageUrl, setCenterImageUrl] = useState("");
   const audioRecorderRef = useRef<MediaRecorder | null>(null);
   const [isAudioRecording, setIsAudioRecording] = useState(false);
+
+  // Canvas size from orientation
+  const isPortrait = orientation === "portrait";
 
   useEffect(() => {
     const resize = () => {
@@ -52,7 +58,20 @@ const SoundVisualizer = () => {
     const ro = new ResizeObserver(resize);
     if (containerRef.current) ro.observe(containerRef.current);
     return () => ro.disconnect();
-  }, [canvasRef]);
+  }, [canvasRef, orientation]);
+
+  // Sync pip canvas size with orientation
+  useEffect(() => {
+    const pipCanvas = pipCanvasRef.current;
+    if (!pipCanvas) return;
+    if (isPortrait) {
+      pipCanvas.width = 450;
+      pipCanvas.height = 800;
+    } else {
+      pipCanvas.width = 800;
+      pipCanvas.height = 450;
+    }
+  }, [isPortrait, pipCanvasRef]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -90,6 +109,11 @@ const SoundVisualizer = () => {
   const statusColor = state.statusType === "active" ? "text-emerald-400" : state.statusType === "error" ? "text-red-400" : "text-muted-foreground";
   const showImageUpload = currentStyle === "rounded" || currentStyle === "plain";
 
+  // Canvas container style based on orientation
+  const canvasContainerStyle: React.CSSProperties = isPortrait
+    ? { width: "min(100%, 250px)", margin: "0 auto", aspectRatio: "9/16" }
+    : { width: "100%", height: "350px" };
+
   return (
     <div className="space-y-4">
       {/* Status */}
@@ -98,10 +122,32 @@ const SoundVisualizer = () => {
         {isAudioRecording && <span className="text-orange-400 font-bold animate-pulse text-sm">● AUDIO</span>}
         <StatusIcon className={`w-4 h-4 ${statusColor}`} />
         <span className={`text-sm ${statusColor}`}>{state.status}</span>
+
+        {/* Orientation toggle */}
+        <div className="ml-auto flex items-center gap-1 bg-muted rounded-lg p-0.5">
+          <button
+            onClick={() => setOrientation("landscape")}
+            title="Landscape"
+            className={`p-1.5 rounded-md transition-all ${!isPortrait ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <Monitor className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={() => setOrientation("portrait")}
+            title="Portrait"
+            className={`p-1.5 rounded-md transition-all ${isPortrait ? "bg-background shadow text-foreground" : "text-muted-foreground hover:text-foreground"}`}
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+          </button>
+        </div>
       </div>
 
       {/* Canvas */}
-      <div ref={containerRef} className="relative rounded-xl overflow-hidden border border-border" style={{ height: "350px" }}>
+      <div
+        ref={containerRef}
+        className="relative rounded-xl overflow-hidden border border-border"
+        style={canvasContainerStyle}
+      >
         <canvas ref={canvasRef} className="w-full h-full" />
         {showImageUpload && (
           <div className="absolute bottom-3 right-3 flex items-center gap-2">
@@ -191,4 +237,4 @@ const SoundVisualizer = () => {
   );
 };
 
-export default SoundVisualizer;
+export default VisualSoundRecorder;

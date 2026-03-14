@@ -11,7 +11,8 @@ export type VisualizerStyle =
   | "radial"
   | "plain";
 
-export type ThemeName = "ocean" | "emerald" | "sunset" | "cyberpunk" | "aurora" | "blood" | "galaxy" | "neon";
+export type ThemeName = "ocean" | "emerald" | "sunset" | "cyberpunk" | "aurora" | "blood" | "galaxy" | "neon" | "light" | "plain";
+export type Orientation = "landscape" | "portrait";
 
 interface AudioState {
   isActive: boolean;
@@ -30,6 +31,10 @@ const THEME_COLORS: Record<ThemeName, { accentStart: string; accentEnd: string; 
   blood:    { accentStart: "#dc2626", accentEnd: "#7f1d1d", bgFrom: "#1a0000", bgTo: "#0a0000", glow: "#dc2626" },
   galaxy:   { accentStart: "#8b5cf6", accentEnd: "#6366f1", bgFrom: "#0c0020", bgTo: "#030014", glow: "#8b5cf6" },
   neon:     { accentStart: "#84cc16", accentEnd: "#22c55e", bgFrom: "#0a1a00", bgTo: "#001a0a", glow: "#84cc16" },
+  // Light theme: white/light-gray background, vivid blue accent
+  light:    { accentStart: "#2563eb", accentEnd: "#2563eb", bgFrom: "#f8fafc", bgTo: "#e2e8f0", glow: "#2563eb" },
+  // Plain theme: flat neutral background, flat accent (no glow)
+  plain:    { accentStart: "#6366f1", accentEnd: "#6366f1", bgFrom: "#1e1e2e", bgTo: "#1e1e2e", glow: "#6366f1" },
 };
 
 export function useAudioVisualizer() {
@@ -44,6 +49,7 @@ export function useAudioVisualizer() {
   const [smoothness, setSmoothness] = useState(5);
   const [currentStyle, setCurrentStyle] = useState<VisualizerStyle>("bars");
   const [theme, setTheme] = useState<ThemeName>("ocean");
+  const [orientation, setOrientation] = useState<Orientation>("landscape");
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -417,7 +423,15 @@ export function useAudioVisualizer() {
       const pipCtx = pipCanvas.getContext("2d");
       if (pipCtx) {
         pipCtx.clearRect(0, 0, pipCanvas.width, pipCanvas.height);
-        pipCtx.drawImage(canvas, 0, 0, pipCanvas.width, pipCanvas.height);
+        // Draw with aspect-ratio preserving letterbox/pillarbox
+        const sw = canvas.width, sh = canvas.height;
+        const dw = pipCanvas.width, dh = pipCanvas.height;
+        const scale = Math.min(dw / sw, dh / sh);
+        const ox = (dw - sw * scale) / 2;
+        const oy = (dh - sh * scale) / 2;
+        pipCtx.fillStyle = "#000";
+        pipCtx.fillRect(0, 0, dw, dh);
+        pipCtx.drawImage(canvas, ox, oy, sw * scale, sh * scale);
       }
     }
     animationIdRef.current = requestAnimationFrame(visualize);
@@ -531,6 +545,7 @@ export function useAudioVisualizer() {
   return {
     state, sensitivity, setSensitivity, smoothness, setSmoothness,
     currentStyle, setCurrentStyle, theme, setTheme,
+    orientation, setOrientation,
     canvasRef, pipCanvasRef, pipVideoRef, setCenterImage,
     startMic, stopMic, toggleRecording, togglePip, exportAudioOnly,
   };
